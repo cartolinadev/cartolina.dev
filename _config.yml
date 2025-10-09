@@ -16,8 +16,7 @@ plugins:
 
 # Theme opts
 logo: /assets/images/cartolina-logo-bw.png
-search: true
-search_full_content: true
+search: false
 minimal_mistakes_skin: "default"
 atom_feed:
   hide: true

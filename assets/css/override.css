@@ -3,28 +3,37 @@
   display: none !important;
 }
 
-/* Pastel gray code blocks, minimal colors */
-.highlight, pre, code { background: #f6f8fa !important; color: #111 !important; }
-.highlight { border: 1px solid #e5e7eb; border-radius: 6px; }
-.highlight pre { padding: 12px; overflow: auto; }
-code { padding: 2px 4px; border: 1px solid #e5e7eb; border-radius: 4px; }
+/* --- Code blocks: flat, readable, no double boxes --- */
+.highlighter-rouge,
+.highlight { background:#f6f8fa !important; border:0px solid #e5e7eb; border-radius:6px; }
 
-/* Neutralize Rouge token colors (keep it mostly black) */
-.highlight .c, .highlight .cm, .highlight .cp, .highlight .c1,
-.highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt,
-.highlight .nf, .highlight .nc, .highlight .nn, .highlight .nb, .highlight .no, .highlight .na,
-.highlight .o, .highlight .ow, .highlight .p,
-.highlight .s, .highlight .s1, .highlight .s2, .highlight .sb, .highlight .sd, .highlight .se,
-.highlight .si, .highlight .sr, .highlight .sx, .highlight .ss
-{ color: inherit !important; font-weight: normal !important; }
+.highlight pre,
+pre { background:transparent !important; margin:0; padding:12px; overflow:auto; }
 
-/* Let the links row actually shrink instead of forcing the logo tiny */
-.greedy-nav .visible-links {
-  display: flex;
-  flex: 1 1 auto;   /* allow shrinking */
-  min-width: 0;     /* critical for Chrome/WebKit flex-shrink */
-  gap: 8px;
+/* kill the inner box: <pre><code> inherits bg so we don't get nested borders */
+pre > code { background:transparent !important; border:0; padding:0; }
+
+/* inline code */
+code { background:#f6f8fa; color:#111; border:1px solid #e5e7eb; border-radius:4px; padding:2px 4px; }
+
+/* neutralize Rouge token colors → mostly black text */
+.highlight .c,.highlight .cm,.highlight .cp,.highlight .c1,
+.highlight .k,.highlight .kc,.highlight .kd,.highlight .kn,.highlight .kp,.highlight .kr,.highlight .kt,
+.highlight .nf,.highlight .nc,.highlight .nn,.highlight .nb,.highlight .no,.highlight .na,
+.highlight .o,.highlight .ow,.highlight .p,
+.highlight .s,.highlight .s1,.highlight .s2,.highlight .sb,.highlight .sd,.highlight .se,
+.highlight .si,.highlight .sr,.highlight .sx,.highlight .ss {
+  color:#111 !important; font-weight:normal !important;
 }
+
+.highlight .nt {
+  color: #a92525;
+}
+
+.highlight .nx {
+  color: #3545b9;
+}
+
 
 /* Make each tab flexible and a bit tighter */
 .greedy-nav .visible-links > li       { flex: 0 1 auto; }  /* not fixed-width */
@@ -33,3 +42,9 @@ code { padding: 2px 4px; border: 1px solid #e5e7eb; border-radius: 4px; }
 /* Give the logo sane space and increase its size */
 .masthead .site-logo        { flex: 0 0 auto; margin-right: 12px; }
 .masthead .site-logo img    { height: 48px; max-height: none; width: auto; }
+
+
+/* Right-column sticky ToC (fallback if theme places ToC above content) */
+.toc { float: right; width: 260px; margin: 0 0 1rem 24px; }
+.toc .toc__menu { position: sticky; top: 96px; max-height: calc(100vh - 120px); overflow: auto; }
+@media (max-width: 1024px){ .toc { float: none; width: auto; margin: 0 0 1rem 0; } }
