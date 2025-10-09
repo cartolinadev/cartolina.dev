@@ -2,6 +2,7 @@ title: Cartolina
 description: Open-source 3D cartography stack.
 url: https://cartolina.dev
 baseurl: ""
+masthead_title: ""
 
 # Minimal Mistakes via remote_theme
 remote_theme: "mmistakes/minimal-mistakes"
@@ -16,6 +17,7 @@ plugins:
 # Theme opts
 logo: /assets/images/cartolina-logo-bw.png
 search: true
+search_full_content: true
 minimal_mistakes_skin: "default"
 atom_feed:
   hide: true
@@ -33,3 +35,4 @@ defaults:
       toc: true            # right sticky ToC by default
       toc_sticky: true
       classes: wide
+      
