@@ -1,0 +1,35 @@
+/* Hide the textual site title that appears next to the logo */
+.site-title {
+  display: none !important;
+}
+
+/* Pastel gray code blocks, minimal colors */
+.highlight, pre, code { background: #f6f8fa !important; color: #111 !important; }
+.highlight { border: 1px solid #e5e7eb; border-radius: 6px; }
+.highlight pre { padding: 12px; overflow: auto; }
+code { padding: 2px 4px; border: 1px solid #e5e7eb; border-radius: 4px; }
+
+/* Neutralize Rouge token colors (keep it mostly black) */
+.highlight .c, .highlight .cm, .highlight .cp, .highlight .c1,
+.highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt,
+.highlight .nf, .highlight .nc, .highlight .nn, .highlight .nb, .highlight .no, .highlight .na,
+.highlight .o, .highlight .ow, .highlight .p,
+.highlight .s, .highlight .s1, .highlight .s2, .highlight .sb, .highlight .sd, .highlight .se,
+.highlight .si, .highlight .sr, .highlight .sx, .highlight .ss
+{ color: inherit !important; font-weight: normal !important; }
+
+/* Let the links row actually shrink instead of forcing the logo tiny */
+.greedy-nav .visible-links {
+  display: flex;
+  flex: 1 1 auto;   /* allow shrinking */
+  min-width: 0;     /* critical for Chrome/WebKit flex-shrink */
+  gap: 8px;
+}
+
+/* Make each tab flexible and a bit tighter */
+.greedy-nav .visible-links > li       { flex: 0 1 auto; }  /* not fixed-width */
+.greedy-nav .visible-links > li > a   { padding: 6px 10px; font-size: 0.95rem; }
+
+/* Give the logo sane space and increase its size */
+.masthead .site-logo        { flex: 0 0 auto; margin-right: 12px; }
+.masthead .site-logo img    { height: 48px; max-height: none; width: auto; }
