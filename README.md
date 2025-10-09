@@ -5,7 +5,7 @@
 gem install --user-install bundler jekyll-include-cache
 export PATH="$HOME/.gem/ruby/$(ruby -e 'print RUBY_VERSION[/^\d+\.\d+/]')/bin:$PATH"
 bundle install
-bundle exec jekyll serve --livereload --config _config.yml,_config.dev.yml --force_polling --livereload
+bundle exec jekyll serve --host 0.0.0.0 --livereload --config _config.yml,_config.dev.yml --force_polling --livereload
 # http://127.0.0.1:4000
 ```
 

@@ -1,5 +1,5 @@
 ---
-title: Getting started
+title: ""
 permalink: /getting-started/
 layout: single
 sidebar:

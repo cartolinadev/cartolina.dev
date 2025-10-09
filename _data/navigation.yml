@@ -1,12 +1,14 @@
 main:
-  - title: Home
+  - title: Overview
     url: /
-  - title: Getting started
-    url: /getting-started/
+  - title: Examples
+    url: /examples/
+  - title: Usage
+    url: /usage/
     children:
       - title: Install
         url: /getting-started/#install
-      - title: Minimal init
-        url: /getting-started/#minimal-init
-  - title: Examples
-    url: /examples/
+  - title: Contributing
+    url: /contributing/
+  - title: About
+    url: /about/
