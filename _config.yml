@@ -2,7 +2,16 @@ title: Cartolina
 description: Open-source 3D cartography stack.
 url: https://cartolina.dev
 baseurl: ""
+cartolina_js:
+  base: "https://cdn.tspl.re/libs/cartolina/dist/current/"
+  style: "https://cdn.tspl.re/libs/cartolina/dist/current/cartolina.min.css"
+  esm_library: "https://cdn.tspl.re/libs/cartolina/dist/current/cartolina.min.esm.js" 
 masthead_title: ""
+livereload: true
+force_polling: true
+webrick:
+  headers:
+    Cache-Control: "no-cache, no-store, must-revalidate"
 
 # Minimal Mistakes via remote_theme
 remote_theme: "mmistakes/minimal-mistakes"
@@ -34,4 +43,18 @@ defaults:
       toc: true            # right sticky ToC by default
       toc_sticky: true
       classes: wide
+      
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-github"
+      url: "https://github.com/cartolina/cartolina-js"
+    - label: "Twitter"
+      icon: "fab fa-twitter"
+      url: "https://twitter.com/@ondrej1974"
+    - label: "LinkedIn"
+      icon: "fab fa-linkedin"
+      url: "https://www.linkedin.com/in/ondrejprochazka/"
+
+copyright: "Ondřej Procházka, Montevallo Consulting, s.r.o"
       

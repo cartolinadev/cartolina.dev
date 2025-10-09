@@ -1,0 +1,5 @@
+url: http://localhost:4000/
+cartolina_js:
+  base: "http://localhost:8080/build"
+  style: "http://localhost:8080/build/cartolina.css"
+  esm_library: "http://localhost:8080/build/cartolina.esm.js" 

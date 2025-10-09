@@ -1,3 +1,12 @@
+/* Reduce body text font size without touching headings, tabs, or toc */
+.page__content p,
+.page__content li,
+.page__content dd,
+.page__content dt {
+  font-size: 0.9rem; 
+  line-height: 1.55;
+}
+
 /* Hide the textual site title that appears next to the logo */
 .site-title {
   display: none !important;
@@ -34,6 +43,10 @@ code { background:#f6f8fa; color:#111; border:1px solid #e5e7eb; border-radius:4
   color: #3545b9;
 }
 
+.highlight .nx {
+  color: "#d76c5c";
+}
+
 
 /* Make each tab flexible and a bit tighter */
 .greedy-nav .visible-links > li       { flex: 0 1 auto; }  /* not fixed-width */
@@ -45,6 +58,9 @@ code { background:#f6f8fa; color:#111; border:1px solid #e5e7eb; border-radius:4
 
 
 /* Right-column sticky ToC (fallback if theme places ToC above content) */
+.wide .sidebar__right.sticky { float: right; }
 .toc { float: right; width: 260px; margin: 0 0 1rem 24px; }
-.toc .toc__menu { position: sticky; top: 96px; max-height: calc(100vh - 120px); overflow: auto; }
+.toc .toc__menu  { position: sticky; top: 96px; max-height: calc(100vh - 120px); overflow: auto; }
 @media (max-width: 1024px){ .toc { float: none; width: auto; margin: 0 0 1rem 0; } }
+
+

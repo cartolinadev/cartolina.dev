@@ -3,5 +3,10 @@ main:
     url: /
   - title: Getting started
     url: /getting-started/
+    children:
+      - title: Install
+        url: /getting-started/#install
+      - title: Minimal init
+        url: /getting-started/#minimal-init
   - title: Examples
     url: /examples/
