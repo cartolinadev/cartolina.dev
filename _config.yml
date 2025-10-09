@@ -1,0 +1,35 @@
+title: Cartolina
+description: Open-source 3D cartography stack.
+url: https://cartolina.dev
+baseurl: ""
+
+# Minimal Mistakes via remote_theme
+remote_theme: "mmistakes/minimal-mistakes"
+
+# Plugins: include_cache is required to avoid 'Unknown tag include_cached'
+plugins:
+  - jekyll-include-cache
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Theme opts
+logo: /assets/images/cartolina-logo-bw.png
+search: true
+minimal_mistakes_skin: "default"
+atom_feed:
+  hide: true
+
+# Navigation
+# Top tabs use _data/navigation.yml (collection 'main')
+# Optional sidebar can mirror the same 'main' nav by setting 'sidebar: nav: main' in page front matter.
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: single
+      author_profile: false
+      toc: true            # right sticky ToC by default
+      toc_sticky: true
+      classes: wide
