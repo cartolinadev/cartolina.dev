@@ -40,7 +40,7 @@ defaults:
     values:
       layout: single
       author_profile: false
-      toc: true            # right sticky ToC by default
+      toc: false            # right sticky ToC by default
       toc_sticky: true
       classes: wide
       

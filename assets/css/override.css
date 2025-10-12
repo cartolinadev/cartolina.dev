@@ -30,7 +30,7 @@ code { background:#f6f8fa; color:#111; border:1px solid #e5e7eb; border-radius:4
 .highlight .k,.highlight .kc,.highlight .kd,.highlight .kn,.highlight .kp,.highlight .kr,.highlight .kt,
 .highlight .nf,.highlight .nc,.highlight .nn,.highlight .nb,.highlight .no,.highlight .na,
 .highlight .o,.highlight .ow,.highlight .p,
-.highlight .s,.highlight .s1,.highlight .s2,.highlight .sb,.highlight .sd,.highlight .se,
+.highlight .s2,.highlight .sb,.highlight .sd,.highlight .se,
 .highlight .si,.highlight .sr,.highlight .sx,.highlight .ss {
   color:#111 !important; font-weight:normal !important;
 }
@@ -40,13 +40,16 @@ code { background:#f6f8fa; color:#111; border:1px solid #e5e7eb; border-radius:4
 }
 
 .highlight .nx {
-  color: #3545b9;
+  color: #111;
 }
 
-.highlight .nx {
-  color: "#d76c5c";
+.highlight .mf, .highlight .nx, .highlight .mi {
+  color: #111;
 }
 
+.highlight .s1, .highlight .dl, .highlight .s {
+  color: #157915;
+}
 
 /* Make each tab flexible and a bit tighter */
 .greedy-nav .visible-links > li       { flex: 0 1 auto; }  /* not fixed-width */
@@ -63,4 +66,14 @@ code { background:#f6f8fa; color:#111; border:1px solid #e5e7eb; border-radius:4
 .toc .toc__menu  { position: sticky; top: 96px; max-height: calc(100vh - 120px); overflow: auto; }
 @media (max-width: 1024px){ .toc { float: none; width: auto; margin: 0 0 1rem 0; } }
 
+/* Compress list spacing inside article content */
+.page__content ul,
+.page__content ol {
+  margin-top: 0.25em;   /* was ~1em */
+  margin-bottom: 0.25em;
+}
+
+.page__content li {
+  margin-bottom: 0.15em; /* reduce space between list items */
+}
 
