@@ -21,7 +21,7 @@ import { map as createMap } from '{{ site.cartolina_js.esm_library }}';
 
 let map = createMap({
     container: 'map',
-    style: './quickstart.json?',
+    style: '/assets/styles/quickstart.json?',
     position: ['obj', -118.302, 36.560, 'fix', 3313, -133, -25, 0.00, 33347,
     45], 
     options: {
@@ -40,7 +40,7 @@ import { map as createMap } from '{{ site.cartolina_js.esm_library }}';
 
 let map = createMap({
     container: 'map',
-    style: '{{ site.url }}/quickstart.json',
+    style: '{{ site.url }}/assets/styles/quickstart.json',
     position: ['obj', -118.302, 36.560, 'fix', 3313, -133, -25, 0.00, 33347, 45]
   });
 
