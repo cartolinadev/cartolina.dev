@@ -6,10 +6,14 @@ sidebar:
   nav: main   
 ---
 
+![shaded relief](/assets/images/haze-shadows-narrow.jpg)
+
+
+## Examples
 
 [Simple terrain with exaggeration, haze and shadows](/examples/simple-terrain-exaggeration-haze-shadows)
 
-Terrain with draped satellite image and point labels
+Terrain draped with satellite imagery and lettering
 
 Terrain using server-side shaded relief with view-dependent transparency
 
