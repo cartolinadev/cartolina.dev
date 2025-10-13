@@ -1,4 +1,4 @@
-# Cartolina — Minimal Mistakes defaults (logo, tabs, single copyright)
+This repo holds the source for the [cartolina.dev](https://cartolina.dev/) website.
 
 ## Local dev
 ```bash

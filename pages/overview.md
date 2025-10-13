@@ -9,11 +9,11 @@ sidebar:
 
 <!-- ![Water speculars](/assets/images/water-speculars-narrow.jpg) -->
 
-## Quickstart
-
 `cartolina` is an experimental software stack for a web-based 3D cartographic
-terrain representation.  It consists of a backend tile server and a frontend
-library.
+terrain representation.  It consists of `cartolina-js`, a frontend
+library, and `cartolina-tileserver`, a backend tile server.
+
+## Quickstart
 
 <div id="map" style="height:400px"></div>
 <script type="module">
@@ -88,8 +88,7 @@ corresponding GitHub repositories (follow the links above).
 
 `cartolina` is open source under a permissive BSD 2-clause license.
 
-Please see the [license section]({{ '/using-cartolina/#license' |
-relative_url }}) for more information on the scope of permission to use the
-tileserver currently hosted at cdn.tspl.re, which is used in the examples on
-this website.
+The tile server resources hosted at `cdn.tspl.re` and used throught the examples 
+on this  website are free to use for development and evaluation. Contact me for any kind 
+of production or commercial use. 
 

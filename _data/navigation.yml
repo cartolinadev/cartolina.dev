@@ -5,9 +5,9 @@ main:
     url: /examples/
   - title: Usage
     url: /usage/
-    children:
-      - title: Install
-        url: /getting-started/#install
+#    children:
+#      - title: Install
+#        url: /getting-started/#install
   - title: Contributing
     url: /contributing/
   - title: About
