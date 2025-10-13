@@ -1,48 +1,48 @@
 ---
-title: Examples
+title: Simple terrain with exaggeration, haze and shadows
 permalink: /examples/
 layout: single
 sidebar:
-  nav: main   # put the site nav in the left column; remove to hide
+  nav: main   
 ---
 
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
-doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
-veritatis et quasi architecto beatae vitae dicta sunt explicabo.  Nemo enim
-ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
-consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.  Neque
-porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur,
-adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et
-dolore magnam aliquam quaerat voluptatem.  Ut enim ad minima veniam, quis
-nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid
-ex ea commodi consequatur?  Quis autem vel eum iure reprehenderit qui in ea
-voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem
-eum fugiat quo voluptas nulla pariatur?
 
-## Live stub
+This example provides a planet-wide visualization of Copernicus GLO-30 DEM. It's 
+the same configuration as the one used [here](/#quickstart) with a couple of 
+distinctions. Vertical exaggeration is set to vary between 1 and 16 according 
+to the map scale. The atmospheric visibility is made dependent on 
+distance, making the haze more pronounced in close-up views.  
 
-<div id="example-1">
-  <button id="run-demo">Run demo</button>
-  <pre id="out">output: (click the button)</pre>
-</div>
+<div id="map" style="height:400px"></div>
+<script type="module">
+import { map as createMap } from '{{ site.cartolina_js.esm_library }}';
 
-```js
-// Simple hillshade intensity from a normal and light direction
-function hillshade(nx, ny, nz, lx = 0.5, ly = 0.5, lz = 0.707) {
-  return Math.max(0, nx * lx + ny * ly + nz * lz);
-}
-```
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("run-demo");
-  const out = document.getElementById("out");
-  if (btn) btn.onclick = () => { out.textContent = "output: " + Math.random().toFixed(3); };
-});
+let map = createMap({
+    container: 'map',
+    style: '/assets/styles/01-simple.json',
+    position: ['obj', -123, 47, 'fix', 609.68, 138.46, -4.67, 0, 46453, 25],
+    options: {
+	    controlFullscreen: true
+    }
+  });
+  
 </script>
 
-## Map container
+<p/>
+A related example leaves out the illumination altogether, showing just the haze 
+and shadows effects.
+  
+<div id="map2" style="height:400px"></div>
+<script type="module">
+//import { map as createMap } from '{{ site.cartolina_js.esm_library }}';
 
-```html
-<div id="map" style="width:100%;height:480px;border:1px solid #e5e7eb"></div>
-```
+let map2 = createMap({
+    container: 'map2',
+    style: '/assets/styles/01a-simple.json',
+    position: ['obj', -123, 47, 'fix', 609.68, 138.46, -4.67, 0, 46453, 25], 
+    options: {
+	    controlFullscreen: true
+    }
+  });
+  
+</script>

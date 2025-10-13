@@ -43,6 +43,11 @@ defaults:
       toc: false            # right sticky ToC by default
       toc_sticky: true
       classes: wide
+
+exclude:
+  - ".#*"
+  - "#*#"
+  - ".DS_Store"
       
 footer:
   links:
