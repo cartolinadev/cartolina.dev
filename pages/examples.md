@@ -1,5 +1,5 @@
 ---
-title: ""
+title: "Cartolina — examples"
 permalink: /examples/
 layout: single
 sidebar:

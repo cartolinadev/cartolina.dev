@@ -1,5 +1,5 @@
 ---
-title: ""
+title: "Cartolina — usage"
 permalink: /usage/
 layout: single
 sidebar:
