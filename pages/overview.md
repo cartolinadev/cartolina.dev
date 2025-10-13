@@ -1,19 +1,20 @@
 ---
-title: ""
+title: "Cartolina – 3D terrain cartography for the web"
 permalink: /
 layout: single
 toc: false
 sidebar:
   nav: main
-seo:
-  title: "Cartolina – 3D terrain cartography for the web"
-  description: "cartolina is an experimental software stack for a web-based 3D cartographic
+header:
+  overlay_filter: 0
+  
+description: "cartolina is an experimental software stack for a web-based 3D cartographic
   terrain representation.  It consists of a frontend JS library and a C++ backend tile server."
 ---
 
----
-
 <!-- ![Water speculars](/assets/images/water-speculars-narrow.jpg) -->
+
+# Cartolina — 3D terrain cartography for the web
 
 `cartolina` is an experimental software stack for a web-based 3D cartographic
 terrain representation.  It consists of `cartolina-js`, a frontend

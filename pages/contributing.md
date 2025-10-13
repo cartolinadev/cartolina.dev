@@ -1,5 +1,5 @@
 ---
-title: 
+title: Cartolina - getting involved
 permalink: /contributing/
 layout: single
 sidebar:

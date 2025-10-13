@@ -1,5 +1,5 @@
 ---
-title:
+title: Cartolina — about cartolina
 permalink: /about/
 layout: single
 sidebar:
