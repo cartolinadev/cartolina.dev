@@ -1,6 +1,6 @@
 ---
 title: ""
-permalink: /examples
+permalink: /examples/
 layout: single
 sidebar:
   nav: main   
