@@ -1,10 +1,14 @@
 ---
-title: About
+title:
 permalink: /about/
 layout: single
 sidebar:
   nav: main 
 ---
+
+![water](/assets/images/water-speculars-narrow.jpg)
+
+## About `cartolina`
 
 `Cartolina` has been created as an experimental and narrowly focused fork of 
 `vts-geospatial`, a former end-to-end 3D map streaming and rendering stack 
@@ -20,4 +24,5 @@ the original open-source license.
 ## About the author
 
 I am an independent software engineer and researcher living in Prague.
+
 

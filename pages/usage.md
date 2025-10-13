@@ -1,26 +1,15 @@
 ---
 title: ""
-permalink: /getting-started/
+permalink: /usage/
 layout: single
 sidebar:
-  nav: main   # left column replicates tabs; remove this block to hide sidebar
+  nav: main   
 ---
 
-## Install
+Please refer to the GitHub repositories for [cartolina-js](https://github.com/cartolinadev/cartolina-js)
+and [cartolina-tileserver](https://github.com/cartolinadev/cartolina-tileserver) for up-to-date 
+information on how to install and use `cartolina`.
 
-```bash
-npm install @cartolina/core
-```
+You can also analyze use the map style from the [examples section](/examples) as a starting point.
 
-## Minimal init
 
-```html
-<div id="map"></div>
-<script type="module">
-  import { createMap } from "https://cdn.example.com/cartolina.js";
-  const map = createMap(document.getElementById("map"), {
-    terrain: "dem",
-    basemap: "outdoors"
-  });
-</script>
-```
