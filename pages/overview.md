@@ -87,8 +87,7 @@ let map = createMap({
 : is a Unix server deamon, written in C++, which processes geospatial data and streams them
 over the network in formats suitable for rendering by Cartolina JS. 
 
-You can find more information about the two components in the [Using
-Cartolina tab]({{ '/using-cartolina/#license' | relative_url }}) or in their
+You can find more information about the two components in their
 corresponding GitHub repositories (follow the links above).
 
 ## License
