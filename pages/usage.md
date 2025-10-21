@@ -16,6 +16,6 @@ Please refer to the GitHub repositories for [cartolina-js](https://github.com/ca
 and [cartolina-tileserver](https://github.com/cartolinadev/cartolina-tileserver) for  
 information on how to install and use `cartolina`.
 
-You can also analyze use the map style from the [examples section](/examples) as a starting point.
+You can also use the map styles from the [examples section](/examples) as a starting point.
 
 
