@@ -30,7 +30,8 @@ let map = createMap({
 
 <p/>
 A related example leaves out the illumination altogether, showing just the haze 
-and shadows effects.
+and shadows effects. The entire Earth surface is effectively renderer in a single 
+pale yellow color.
   
 <div id="map2" style="height:400px"></div>
 <script type="module">
