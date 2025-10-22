@@ -1,5 +1,5 @@
 title: Cartolina
-description: Open-source 3D cartography stack.
+description: Open-source 3D cartography for the web
 url: https://cartolina.dev
 baseurl: ""
 cartolina_js:
@@ -25,10 +25,22 @@ plugins:
 
 # Theme opts
 logo: /assets/images/cartolina-logo-bw.png
+
 search: false
 minimal_mistakes_skin: "default"
 atom_feed:
   hide: true
+
+# social
+social:
+  name: "Cartolina"
+  links:
+    - https://github.com/cartolinadev
+
+twitter:
+  username: ondrej1974
+
+og_image: /assets/images/social/default.jpg  
 
 # Navigation
 # Top tabs use _data/navigation.yml (collection 'main')
