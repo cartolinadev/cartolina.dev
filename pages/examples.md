@@ -13,7 +13,7 @@ sidebar:
 
 [Simple terrain with exaggeration, haze and shadows](/examples/simple-terrain-exaggeration-haze-shadows)
 
-Terrain draped with satellite imagery and lettering
+Terrain with satellite imagery and lettering
 
 Terrain using server-side shaded relief with view-dependent transparency
 
