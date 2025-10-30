@@ -23,6 +23,6 @@ open-source license.
 
 ## About the author
 
-I am an independent software engineer and researcher living in Prague.
+I am an [independent software engineer and researcher](https://www.linkedin.com/in/ondrejprochazka/) living in Prague.
 
 
