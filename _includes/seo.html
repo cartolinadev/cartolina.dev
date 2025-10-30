@@ -1,0 +1,56 @@
+<!-- BEGIN SEO include (cartolina override) -->
+{%- comment -%}
+Minimal SEO override for Cartolina.dev.
+We emit standard meta + OG + Twitter + canonical + ONE JSON-LD block.
+{%- endcomment -%}
+
+<title>{{ page.title | default: site.title | escape }}</title>
+
+{%- assign desc = page.description | default: site.description | strip_newlines | escape -%}
+<meta name="description" content="{{ desc }}">
+
+<link rel="canonical" href="{{ page.url | absolute_url }}">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ page.title | default: site.title | escape }}">
+<meta property="og:description" content="{{ desc }}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta property="og:site_name" content="{{ site.title | escape }}">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ page.title | default: site.title | escape }}">
+<meta name="twitter:description" content="{{ desc }}">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Cartolina",
+  "alternateName": "Cartolina.dev",
+  "applicationCategory": "Cartography software",
+  "url": "https://cartolina.dev/",
+  "description": "Cartolina.dev is an open-source software for web-based 3D terrain cartography.",
+  "author": {
+    "@type": "Person",
+    "name": "Ondřej Procházka",
+    "alternateName": "Ondrej Prochazka",
+    "url": "https://cartolina.dev/"
+  },
+  "publisher": [
+    {
+      "@type": "Person",
+      "name": "Ondřej Procházka",
+      "alternateName": "Ondrej Prochazka",
+      "url": "https://cartolina.dev/"
+    },
+    {
+      "@type": "Organization",
+      "name": "Montevallo Consulting s.r.o.",
+      "url": "https://cartolina.dev/"
+    }
+  ],
+  "codeRepository": "https://github.com/cartolinadev",
+  "programmingLanguage": ["C++", "TypeScript"]
+}
+</script>
+<!-- END SEO include (cartolina override) -->
