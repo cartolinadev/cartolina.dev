@@ -19,7 +19,7 @@ settings are used for the physical atmosphere.  The satellite layer is
 slightly lightened relative to the darker original to accentuate the impact
 of relief shading.  Sun glints on ice and water are based on <a
 href="https://esa-worldcover.org/" target="_blank" rel="noopener">ESA
-worldcover</a>.
+WorldCover</a>.
 
 Peak labels are served live from <a href="https://openfreemap.org/"
 target="_blank" rel="noopener">OpenFreeMap</a>, with the original tiles
