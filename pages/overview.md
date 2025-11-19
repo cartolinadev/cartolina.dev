@@ -16,9 +16,9 @@ description: "cartolina is an experimental software stack for a web-based 3D car
 
 # Cartolina — 3D terrain cartography for the web
 
-`cartolina` is an experimental software stack for a web-based 3D cartographic
-terrain representation.  It consists of `cartolina-js`, a frontend
-library, and `cartolina-tileserver`, a backend tile server.
+Cartolina is an experimental software stack for a web-based 3D cartographic
+terrain representation.  It consists of [cartolina-js](#components), a frontend
+library, and [cartolina-tileserver](#components), a backend tile server.
 
 ## Quickstart
 
@@ -78,7 +78,7 @@ let map = createMap({
 
 
 
-## Components
+## Components {#components}
 
 <a href="https://github.com/cartolinadev/cartolina-js" target="_blank" rel="noopener">**cartolina-js**</a>
 : is a frontend rendering library, written in WebGL2, JavaScript and TypeScript.
@@ -92,7 +92,7 @@ corresponding GitHub repositories (follow the links above).
 
 ## License
 
-`cartolina` is open source under a permissive BSD 2-clause license.
+Cartolina is open source under a permissive BSD 2-clause license.
 
 The tile server resources hosted at `cdn.tspl.re` and used throught the examples 
 on this  website are free to use for development and evaluation. Contact me for any kind 
