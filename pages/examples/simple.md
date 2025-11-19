@@ -9,7 +9,7 @@ sidebar:
 
 This example provides a planet-wide visualization of Copernicus GLO-30 DEM. It's 
 the same configuration as the one used [here](/#quickstart) with a couple of 
-distinctions. Vertical exaggeration is set to vary between 1 and 16 according 
+distinctions. Vertical exaggeration is set to vary between 1.3 and 16 according 
 to the map scale. The atmospheric visibility is made dependent on 
 distance, making the haze more pronounced in close-up views.  
 
