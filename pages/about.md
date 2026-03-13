@@ -16,7 +16,7 @@ stack developed by Melown Technologies / Leica Geosystems in 2015–2022 and
 officially discontinued in 2023.
 
 Recognizing the potential of the original system for web-based cartographic 
-terrain representaiton, I retrieved the code from the original GitHub repositories, 
+terrain representation, I retrieved the code from the original GitHub repositories, 
 refactored key parts and added new functionality, maintaining the original 
 open-source license.   
 
