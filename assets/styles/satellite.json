@@ -26,7 +26,8 @@
         "sources": ["topoearth-viewfinder-dem3"]
     },
     "illumination": {
-        "light": ["tracking", 315, 45]
+        "light": ["tracking", 315, 45],
+        "ambientCoef": 0.35
     },
     "vertical-exaggeration" : {
         "heightRamp": [[0,4000], [1.5,1.3]],
