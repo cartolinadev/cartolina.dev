@@ -1560,6 +1560,7 @@ function buildIllumTab() {
   ui.atm.useAtmosphereTop.addEventListener('change', e => {
     state.opts.useAtmosphere = e.target.checked;
     applyRenderingOptions({ useAtmosphere: e.target.checked });
+    if (e.target.checked) applyAtmosphere();
   });
 
   ui.atm.visibilityToEyeDistance = makeSlider({
@@ -2411,6 +2412,14 @@ async function main() {
     return;
   }
   originalStyle = JSON.parse(JSON.stringify(style));
+
+  if (!style.atmosphere) {
+    style.atmosphere = {
+      maxVisibility: state.atm.maxVisibility,
+      visibilityToEyeDistance: state.atm.visibilityToEyeDistance,
+      edgeDistanceToEyeDistance: state.atm.edgeDistanceToEyeDistance,
+    };
+  }
 
   const trackPos = params.has('trackpos');
   const options = cartolina.runtimeOptionsFromUrl({ positionInUrl: trackPos });

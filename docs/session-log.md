@@ -50,3 +50,20 @@
   path. Fixed to omit the key entirely when neither ramp is active.
 - **URL position tracking:** `positionInUrl` is now `false` by default;
   append `?trackpos` to opt in to URL-tracked navigation.
+
+## 2026-04-24
+
+- **Relief-lab default VE ramp values updated** (commit `1d6b0bd`): hardcoded
+  fallback knob positions in `state.ve` changed to match a representative
+  real-world style (`scaleRamp` min `[40000, 1]` / max `[53937538, 13.5]`;
+  `elevationRamp` min `[1700, 2]` / max `[4000, 1.3]`).
+- **`setAtmosphere` bug found in cartolina-js** (backlog entry added): on styles
+  without an `atmosphere` section (e.g. `harrachov.json`), `map.setAtmosphere()`
+  is silently discarded because `this._map.atmosphere` is null and the
+  optional-chain short-circuits. `getAtmosphere()` returns null both before and
+  after the call, giving no feedback. Enabling `mapFlagAtmosphere` has no visual
+  effect in this case. Workaround applied in the relief-lab demo: inject a
+  default atmosphere object into the style before passing to `cartolina.map()`
+  (only when the style has no atmosphere section, and only on the copy passed to
+  the engine — `originalStyle` is kept unmodified). Comment added to
+  `src/browser/viewer.ts:setAtmosphere`.
