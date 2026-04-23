@@ -1343,7 +1343,11 @@ function buildCurrentStyle() {
     const el = state.ve.elev;
     ve.elevationRamp = { min: [el.x1, el.y1], max: [el.x2, el.y2] };
   }
-  out['vertical-exaggeration'] = ve;
+  if (Object.keys(ve).length > 0) {
+    out['vertical-exaggeration'] = ve;
+  } else {
+    delete out['vertical-exaggeration'];
+  }
 
   if (state.opts.useAtmosphere) {
     out.atmosphere = {
@@ -2408,7 +2412,8 @@ async function main() {
   }
   originalStyle = JSON.parse(JSON.stringify(style));
 
-  const options = cartolina.runtimeOptionsFromUrl({ positionInUrl: true });
+  const trackPos = params.has('trackpos');
+  const options = cartolina.runtimeOptionsFromUrl({ positionInUrl: trackPos });
 
   map = cartolina.map({
     container: 'map',
