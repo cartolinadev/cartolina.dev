@@ -44,3 +44,9 @@
 - **Default position updated:** relief-lab default camera position changed
   to `obj,15.302410,50.700302,fix,591.49,55.69,-50.14,0.00,49182.93,30.00`;
   old position commented out in code for easy rollback.
+- **VE style output fix:** `buildCurrentStyle` was always writing
+  `"vertical-exaggeration": {}` when both ramps were disabled — an empty
+  object is truthy so cartolina would enter the deprecated `setSuperElevation`
+  path. Fixed to omit the key entirely when neither ramp is active.
+- **URL position tracking:** `positionInUrl` is now `false` by default;
+  append `?trackpos` to opt in to URL-tracked navigation.
