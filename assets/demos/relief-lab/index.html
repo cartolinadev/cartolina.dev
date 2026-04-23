@@ -2243,7 +2243,7 @@ function syncAtmosphereUi() {
     state.atm.edgeDistanceToEyeDistance.toFixed(2));
 }
 
-function syncVeUi() {
+function syncVeUi(redrawGraphs = true) {
   syncCheckbox(ui.ve.scaleEnabled, state.ve.scaleEnabled);
   syncCheckbox(ui.ve.elevEnabled, state.ve.elevEnabled);
   if (!isInteractionLocked('ve-ppi')) {
@@ -2253,8 +2253,10 @@ function syncVeUi() {
     !state.ve.scaleEnabled);
   document.getElementById('graph-elev-gate').classList.toggle('disabled',
     !state.ve.elevEnabled);
-  scaleGraph.redraw();
-  elevGraph.redraw();
+  if (redrawGraphs) {
+    scaleGraph.redraw();
+    elevGraph.redraw();
+  }
 }
 
 function syncOptsUi() {
@@ -2404,14 +2406,12 @@ function startMapStateSync() {
     syncIlluminationUi();
     syncAtmosphereUi();
 
-    if (!rampEquals(lastScaleRamp, state.ve.scale)
-        || ui.ve.scaleEnabled.checked !== state.ve.scaleEnabled) {
-      syncVeUi();
-      lastScaleRamp = cloneRampState(state.ve.scale);
-      lastElevRamp = cloneRampState(state.ve.elev);
-    } else if (!rampEquals(lastElevRamp, state.ve.elev)
-        || ui.ve.elevEnabled.checked !== state.ve.elevEnabled) {
-      syncVeUi();
+    const scaleChanged = !rampEquals(lastScaleRamp, state.ve.scale)
+        || ui.ve.scaleEnabled.checked !== state.ve.scaleEnabled;
+    const elevChanged = !rampEquals(lastElevRamp, state.ve.elev)
+        || ui.ve.elevEnabled.checked !== state.ve.elevEnabled;
+    syncVeUi(scaleChanged || elevChanged);
+    if (scaleChanged || elevChanged) {
       lastScaleRamp = cloneRampState(state.ve.scale);
       lastElevRamp = cloneRampState(state.ve.elev);
     }

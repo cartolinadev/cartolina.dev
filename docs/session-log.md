@@ -74,6 +74,10 @@
   `makeRampGraph` ran every tick and unconditionally overwrote input values,
   resetting anything typed before it could be committed. Fixed by skipping
   the overwrite when `document.activeElement` is the target input.
+- **Device PPI field empty on load** (fixed): `syncVeUi()` was only called
+  when ramp values changed, so on first load (nothing changed yet) the PPI
+  field never got populated. Fixed by calling `syncVeUi()` on every tick,
+  skipping the graph redraws when values haven't changed.
 - **Relief-lab reset view button** (commit `b4ee042`): semi-transparent black
   button bottom-right of the map, returns camera to initial position via
   `map.setPosition(position)`.
