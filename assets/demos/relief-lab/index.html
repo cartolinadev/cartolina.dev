@@ -89,6 +89,27 @@
   #map {
     flex: 1 1 auto;
     min-width: 0;
+    position: relative;
+  }
+
+  #reset-view {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.35);
+    color: rgba(255, 255, 255, 0.75);
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font: 12px/1.4 var(--font);
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background 150ms, color 150ms;
+  }
+  #reset-view:hover {
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
   }
 
   /* ── brand ─────────────────────────────────────────────── */
@@ -721,7 +742,7 @@
             <div class="row-control color-pair-row">
               <span class="color-pair-label">Diffuse</span>
               <div class="color-row-control" id="ctrl-diffuse"></div>
-              <span class="color-pair-label">Specular</span>
+              <span class="color-pair-label" id="specular-color-label">Specular</span>
               <div class="color-row-control" id="ctrl-specular"></div>
             </div>
           </div>
@@ -946,7 +967,9 @@
 
   <button id="panel-toggle" title="Toggle panel">◀</button>
 
-  <div id="map"></div>
+  <div id="map">
+    <button id="reset-view" title="Reset view">Reset view</button>
+  </div>
 </div>
 
 <script>
@@ -2166,6 +2189,10 @@ function syncIlluminationUi() {
   syncSliderValue(ui.illum.ambient, Math.round(state.illum.ambientCoef * 100));
   syncColorValue(ui.illum.diffuseColor, state.illum.diffuseColor);
   syncColorValue(ui.illum.specularColor, state.illum.specularColor);
+  document.getElementById('specular-color-label').classList.toggle(
+    'disabled', !state.opts.useSpecularMaps);
+  document.getElementById('ctrl-specular').classList.toggle(
+    'disabled', !state.opts.useSpecularMaps);
   syncSliderValue(ui.illum.lambertianWeight,
     Math.round(state.illum.lambertianWeight * 100));
   syncSliderValue(ui.illum.slopeWeight,
@@ -2426,6 +2453,10 @@ async function main() {
   await map.ready;
   startMapStateSync();
   refreshStyleTab();
+
+  document.getElementById('reset-view').addEventListener('click', () => {
+    map.setPosition(position);
+  });
 }
 
 buildIllumTab();
