@@ -9,6 +9,10 @@ Before every commit, review and update the session log so it reflects the
 current state of things. Then commit the session log together with the
 other changes (or in a follow-up commit immediately after).
 
+On a feature branch, commit freely — at milestones during implementation
+or after completing a step — without asking first. On the main branch,
+always ask before committing.
+
 During and after work, append any nontrivial observations to the session
 log:
 - Surprising project structure or configuration details
