@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relief Lab — cartolina</title>
+<script src="https://cdn.tspl.re/libs/cartolina/dist/current/cartolina.min.js"></script>
+<link href="https://cdn.tspl.re/libs/cartolina/dist/current/cartolina.min.css" rel="stylesheet" />
+<style>
+  /* ── tokens ─────────────────────────────────────────────── */
+  :root {
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --accent-rgb: 36, 93, 168;
+    --control-accent-rgb: 77, 126, 190;
+    --panel-bg: rgba(255, 255, 255, 0.72);
+    --panel-fg: #16202b;
+    --panel-muted: #3f4d5c;
+    --panel-border: rgba(255, 255, 255, 0.58);
+    --panel-rule: rgba(16, 24, 40, 0.09);
+    --panel-input-bg: rgba(255, 255, 255, 0.60);
+    --panel-track: rgba(15, 23, 42, 0.10);
+    --panel-graph-bg: rgba(249, 250, 251, 0.64);
+    --panel-w: min(430px, 30vw);
+    --tab-h: 38px;
+    --grid: #e5e5e5;
+    --graph-stroke: #1a1a1a;
+    --graph-grid: #e0e0e0;
+    --graph-hairline: #b0b0b0;
+  }
+
+  /* ── reset ──────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.5 var(--font); color: var(--panel-fg); }
+
+  /* ── layout ─────────────────────────────────────────────── */
+  #shell {
+    position: fixed;
+    inset: 0;
+    display: flex;
+  }
+
+  #panel {
+    position: relative;
+    flex: 0 0 var(--panel-w);
+    width: var(--panel-w);
+    display: flex;
+    flex-direction: column;
+    background: var(--panel-bg);
+    border-right: 1px solid var(--panel-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 2px 0 20px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+    transition: flex-basis 240ms ease, width 240ms ease;
+    z-index: 10;
+  }
+
+  #panel.collapsed {
+    flex-basis: 0;
+    width: 0;
+  }
+
+  #panel-toggle {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 48px;
+    border: 1px solid var(--panel-border);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    background: var(--panel-bg);
+    backdrop-filter: blur(16px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--panel-muted);
+    z-index: 20;
+    padding: 0;
+    box-shadow: 2px 0 8px rgba(15, 23, 42, 0.08);
+    transition: left 240ms ease;
+  }
+
+  #panel-toggle:hover { color: var(--panel-fg); }
+
+  #map {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* ── brand ─────────────────────────────────────────────── */
+  #panel-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 16px 16px;
+    flex-shrink: 0;
+  }
+
+  .brand-logo-frame {
+    position: relative;
+    width: 164px;
+    height: 35px;
+    overflow: hidden;
+    flex: 0 0 auto;
+  }
+
+  .brand-logo {
+    position: absolute;
+    left: -3px;
+    top: -1px;
+    display: block;
+    width: 170px;
+    height: auto;
+  }
+
+  .brand-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .brand-subtitle {
+    margin-top: 6px;
+    margin-left: 1px;
+    font: 11px/1 var(--font);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #586779;
+  }
+
+  /* ── tabs ───────────────────────────────────────────────── */
+  #tabs {
+    display: flex;
+    border-bottom: 1px solid var(--panel-rule);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    height: var(--tab-h);
+    border: none;
+    background: transparent;
+    color: #334150;
+    font: 12px/1 var(--font);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 120ms, border-color 120ms;
+    white-space: nowrap;
+    padding: 0 16px;
+  }
+
+  .tab-btn:hover { color: var(--panel-fg); }
+
+  .tab-btn.active {
+    color: rgb(var(--accent-rgb));
+    border-bottom-color: rgb(var(--accent-rgb));
+  }
+
+  /* ── tab content ────────────────────────────────────────── */
+  #tab-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* ── section headings ───────────────────────────────────── */
+  .section {
+    padding: 20px 24px 18px;
+    border-bottom: 1px solid var(--panel-rule);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-title {
+    margin: 0 0 14px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #334150;
+  }
+
+  /* ── form rows ──────────────────────────────────────────── */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .row:last-child { margin-bottom: 0; }
+
+  .row-label {
+    flex: 0 0 126px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: #263444;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .row-control { flex: 1 1 auto; min-width: 0; }
+  .row-readout {
+    flex: 0 0 42px;
+    text-align: right;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--panel-muted);
+  }
+
+  #pane-illum .row {
+    gap: 8px;
+  }
+
+  #pane-illum .row-label {
+    flex-basis: 110px;
+  }
+
+  #row-ambient .row-label {
+    flex-basis: 138px;
+  }
+
+  #row-ambient .row-control {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-left: auto;
+  }
+
+  .atm-inline-label {
+    flex: 0 0 148px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #263444;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* ── select ─────────────────────────────────────────────── */
+  .rl-select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--panel-rule);
+    border-radius: 6px;
+    background: var(--panel-input-bg);
+    color: inherit;
+    font: 12px/1.2 var(--font);
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%235b6673' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 26px;
+  }
+
+  .rl-select:focus {
+    border-color: rgba(var(--accent-rgb), 0.34);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.10);
+  }
+
+  /* ── slider ─────────────────────────────────────────────── */
+  .rl-slider {
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+
+  .rl-slider::-webkit-slider-runnable-track {
+    height: 5px;
+    border-radius: 999px;
+    background:
+      linear-gradient(
+        to right,
+        rgb(var(--control-accent-rgb)) 0%,
+        rgb(var(--control-accent-rgb)) var(--fill, 50%),
+        rgba(15, 23, 42, 0.18) var(--fill, 50%),
+        rgba(15, 23, 42, 0.18) 100%
+      );
+  }
+
+  .rl-slider::-webkit-slider-thumb {
+    width: 6px;
+    height: 20px;
+    margin-top: -7.5px;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(var(--control-accent-rgb));
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.22);
+    -webkit-appearance: none;
+  }
+
+  .rl-slider::-moz-range-track {
+    height: 5px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.18);
+  }
+
+  .rl-slider::-moz-range-progress {
+    height: 5px;
+    border-radius: 999px;
+    background: rgb(var(--control-accent-rgb));
+  }
+
+  .rl-slider::-moz-range-thumb {
+    width: 6px;
+    height: 20px;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(var(--control-accent-rgb));
+  }
+
+  /* ── color picker ───────────────────────────────────────── */
+  .rl-color {
+    width: 100%;
+    height: 32px;
+    padding: 3px;
+    border: 1px solid var(--panel-rule);
+    border-radius: 6px;
+    background: var(--panel-input-bg);
+    cursor: pointer;
+  }
+
+  .rl-color:focus { outline: none; border-color: rgba(var(--accent-rgb), 0.34); }
+  .rl-color::-webkit-color-swatch-wrapper { padding: 0; }
+  .rl-color::-webkit-color-swatch { border: 0; border-radius: 3px; }
+  .rl-color::-moz-color-swatch { border: 0; border-radius: 3px; }
+
+  .color-row-control {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .color-row-control .rl-color {
+    width: 72px;
+    height: 28px;
+  }
+
+  .color-pair-row {
+    display: grid;
+    grid-template-columns: max-content auto max-content auto;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+  }
+
+  .color-pair-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #263444;
+    white-space: nowrap;
+  }
+
+  /* ── checkbox row ───────────────────────────────────────── */
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .check-row:last-child { margin-bottom: 0; }
+
+  .rl-check {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    accent-color: rgb(var(--control-accent-rgb));
+    cursor: pointer;
+  }
+
+  .check-label {
+    font-size: 12px;
+    color: #263444;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .option-row {
+    display: grid;
+    grid-template-columns: 15px 1fr;
+    column-gap: 8px;
+    row-gap: 4px;
+    align-items: start;
+    margin-bottom: 12px;
+  }
+
+  .option-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .option-row .rl-check {
+    margin-top: 2px;
+  }
+
+  .option-copy {
+    min-width: 0;
+  }
+
+  .option-description {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--panel-muted);
+  }
+
+  .shading-inline-label {
+    flex: 0 0 92px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #263444;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .shading-inline-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .shading-inline-controls .row-control {
+    flex: 1 1 auto;
+  }
+
+  .shading-inline-controls .row-readout {
+    flex: 0 0 42px;
+  }
+
+  /* ── disabled overlay ───────────────────────────────────── */
+  .disabled {
+    opacity: 0.38;
+    pointer-events: none;
+  }
+
+  /* ── numeric input (graph companion) ────────────────────── */
+  .rl-num {
+    width: 88px;
+    padding: 5px 6px;
+    border: 1px solid var(--panel-rule);
+    border-radius: 5px;
+    background: var(--panel-input-bg);
+    color: inherit;
+    font: 12px/1 var(--font);
+    font-variant-numeric: tabular-nums;
+    outline: none;
+    text-align: right;
+  }
+
+  .rl-num:focus { border-color: rgba(var(--accent-rgb), 0.34); }
+
+  .rl-num-wide {
+    width: 128px;
+  }
+
+  /* ── graph widget ───────────────────────────────────────── */
+  .graph-wrap {
+    border: 1px solid var(--panel-rule);
+    border-radius: 8px;
+    background: var(--panel-graph-bg);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .graph-svg {
+    display: block;
+    width: 100%;
+    height: 360px;
+    cursor: crosshair;
+    user-select: none;
+    overflow: visible;
+  }
+
+  .graph-inputs {
+    display: grid;
+    grid-template-columns: 132px 1fr 1fr;
+    column-gap: 14px;
+    row-gap: 10px;
+    align-items: center;
+    padding: 14px 16px;
+    border-top: 1px solid var(--panel-rule);
+    font-size: 11px;
+    color: var(--panel-muted);
+  }
+
+  .graph-inputs label {
+    white-space: nowrap;
+  }
+
+  .graph-input-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    grid-column: 2 / 4;
+  }
+
+  .g-grid { stroke: var(--graph-grid); stroke-width: 1; }
+  .g-axis { stroke: #888; stroke-width: 1; }
+  .g-path { fill: none; stroke: var(--graph-stroke); stroke-width: 2; stroke-linejoin: round; }
+  .g-hairline { stroke: var(--graph-hairline); stroke-width: 1; stroke-dasharray: 4 3; }
+  .g-marker { stroke: #b0203a; stroke-width: 1.25; }
+  .g-marker-handle {
+    fill: #fff5f7;
+    stroke: #b0203a;
+    stroke-width: 1.25;
+    pointer-events: none;
+  }
+  .g-marker-hit {
+    stroke: transparent;
+    stroke-width: 10;
+    cursor: ew-resize;
+  }
+  .g-knob { fill: #fff; stroke: var(--graph-stroke); stroke-width: 1.8; cursor: move; }
+  .g-knob:hover, .g-knob.drag { r: 6; }
+  .g-tick { font-size: 9px; fill: #999; font-family: monospace; }
+  .g-label { font-size: 10px; fill: #333; font-family: monospace; pointer-events: none; }
+  .graph-status {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px;
+    padding: 0 16px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1b1b1b;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .graph-status-label {
+    white-space: nowrap;
+  }
+
+  .graph-status-value {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .row-note {
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--panel-muted);
+  }
+
+  .row-note-offset {
+    margin: 10px 0 0;
+    max-width: 100%;
+  }
+
+  .row-note-gap {
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div id="shell">
+  <div id="panel" class="vts-panel--light">
+
+    <div id="panel-brand">
+      <div class="brand-copy">
+        <div class="brand-logo-frame">
+          <img
+            class="brand-logo"
+            src="https://raw.githubusercontent.com/cartolinadev/assets/refs/heads/main/brand/cartolina-logo.png"
+            alt="cartolina"
+          />
+        </div>
+        <div class="brand-subtitle">relief lab</div>
+      </div>
+    </div>
+
+    <div id="tabs">
+      <button class="tab-btn active" data-tab="illum">Light &amp; Shading</button>
+      <button class="tab-btn" data-tab="ve">Vertical Exaggeration</button>
+      <button class="tab-btn" data-tab="opts">Options</button>
+    </div>
+
+    <div id="tab-content">
+
+      <!-- ── Tab 1: Illumination & Shading ─────────────────── -->
+      <div class="tab-pane active" id="pane-illum">
+
+        <div class="section">
+          <div class="check-row">
+            <input type="checkbox" class="rl-check" id="chk-illumination-top" checked />
+            <label class="check-label" for="chk-illumination-top" style="font-weight:600;">
+              Illumination (lighting)
+            </label>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" class="rl-check" id="chk-atmosphere-top" checked />
+            <label class="check-label" for="chk-atmosphere-top" style="font-weight:600;">
+              Haze (atmosphere)
+            </label>
+          </div>
+        </div>
+
+        <div id="illum-pane-controls">
+        <div class="section">
+          <div class="section-title">Light</div>
+          <div class="row-note" style="margin: 0 0 14px;">
+            These parameters control the light-source geometry and
+            intensity under the Blinn-Phong lighting model.
+          </div>
+
+          <div class="row" id="row-type">
+            <span class="row-label">Type</span>
+            <div class="row-control" id="ctrl-type"></div>
+          </div>
+          <div class="row-note row-note-offset row-note-gap">
+            A tracking light follows the observer, with its geometry
+            defined in the plane perpendicular to the direction of the
+            view. A
+            geographic light follows the map center, with its geometry
+            defined in the local north-east-down reference frame.
+          </div>
+
+          <div class="row" id="row-azimuth">
+            <span class="row-label">Azimuth</span>
+            <div class="row-control" id="ctrl-azimuth"></div>
+            <span class="row-readout" id="read-azimuth"></span>
+          </div>
+
+          <div class="row" id="row-elevation">
+            <span class="row-label">Elevation</span>
+            <div class="row-control" id="ctrl-elevation"></div>
+            <span class="row-readout" id="read-elevation"></span>
+          </div>
+
+          <div class="row" id="row-ambient">
+            <span class="row-label">Ambient intensity</span>
+            <div class="row-control" id="ctrl-ambient"></div>
+            <span class="row-readout" id="read-ambient"></span>
+          </div>
+
+          <div class="row" id="row-colors">
+            <span class="row-label">Light colors</span>
+            <div class="row-control color-pair-row">
+              <span class="color-pair-label">Diffuse</span>
+              <div class="color-row-control" id="ctrl-diffuse"></div>
+              <span class="color-pair-label">Specular</span>
+              <div class="color-row-control" id="ctrl-specular"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Shading</div>
+          <div class="row-note" style="margin: 0 0 12px;">
+            Combined shading computes the diffuse shading coefficient
+            from a geometric average of the three available shading
+            methods.
+          </div>
+
+          <div class="row" id="row-lambertian-w">
+            <input type="checkbox" class="rl-check" id="chk-lambertian" checked />
+            <label class="shading-inline-label" for="chk-lambertian">Lambertian</label>
+            <div class="shading-inline-controls" id="row-lambertian-w-controls">
+              <div class="row-control" id="ctrl-lambertian-w"></div>
+              <span class="row-readout" id="read-lambertian-w"></span>
+            </div>
+          </div>
+
+          <div class="row" id="row-slope-w">
+            <input type="checkbox" class="rl-check" id="chk-slope" checked />
+            <label class="shading-inline-label" for="chk-slope">Slope</label>
+            <div class="shading-inline-controls" id="row-slope-w-controls">
+              <div class="row-control" id="ctrl-slope-w"></div>
+              <span class="row-readout" id="read-slope-w"></span>
+            </div>
+          </div>
+
+          <div class="row" id="row-aspect-w">
+            <input type="checkbox" class="rl-check" id="chk-aspect" />
+            <label class="shading-inline-label" for="chk-aspect">Aspect</label>
+            <div class="shading-inline-controls" id="row-aspect-w-controls">
+              <div class="row-control" id="ctrl-aspect-w"></div>
+              <span class="row-readout" id="read-aspect-w"></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="atmos-pane-controls">
+        <div class="section">
+          <div class="section-title">Haze</div>
+          <div class="row-note" style="margin: 0 0 12px;">
+            Haze uses a simplified physical atmospheric scattering
+            model. Optionally, visibility can be made a function of
+            distance to the map center, and edge of atmosphere may be
+            moved away from the viewer.
+          </div>
+
+          <div class="row" id="row-atm-visibility-factor">
+            <input type="checkbox" class="rl-check"
+              id="chk-atm-visibility-factor" />
+            <label class="atm-inline-label"
+              for="chk-atm-visibility-factor">Visibility to distance ratio</label>
+            <div class="shading-inline-controls"
+              id="row-atm-visibility-factor-controls">
+              <div class="row-control" id="ctrl-atm-visibility-factor"></div>
+              <span class="row-readout" id="read-atm-visibility-factor"></span>
+            </div>
+          </div>
+          <div class="row-note row-note-offset row-note-gap">
+            Make visibility a multiple of distance to map center. This
+            can help make atmospheric effects more pronounced as you
+            move closer to the object of interest, leading to better
+            visual hierarchy.
+          </div>
+
+          <div class="row" id="row-atm-edge-factor">
+            <input type="checkbox" class="rl-check" id="chk-atm-edge-factor" />
+            <label class="atm-inline-label"
+              for="chk-atm-edge-factor">Edge to distance ratio</label>
+            <div class="shading-inline-controls"
+              id="row-atm-edge-factor-controls">
+              <div class="row-control" id="ctrl-atm-edge-factor"></div>
+              <span class="row-readout" id="read-atm-edge-factor"></span>
+            </div>
+          </div>
+          <div class="row-note row-note-offset">
+            Make atmosphere start at a distance, derived from how far
+            the viewer is from the center. This ensures the center of
+            the view and the foreground stay clear of haze.
+          </div>
+        </div>
+        </div>
+        </div>
+
+      </div>
+
+      <!-- ── Tab 2: Vertical Exaggeration ──────────────────── -->
+      <div class="tab-pane" id="pane-ve">
+
+        <div class="section">
+          <div class="row-note">
+            Vertical exaggeration may be expressed as a power-law
+            function of the scale denominator, as a linear function of
+            elevation, or both. When both are used, the final vertical
+            exaggeration is determined as the product of the two
+            contributing factors.
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="check-row">
+            <input type="checkbox" class="rl-check" id="chk-scale-ve" />
+            <label class="check-label" for="chk-scale-ve" style="font-weight:500;">Scale-based vertical exaggeration</label>
+          </div>
+          <div class="row-note" style="margin: 0 0 12px;">
+            Vertical exaggeration factor, depending on scale
+            denominator. Note the logarithmic scale.
+          </div>
+          <div id="graph-scale-gate">
+            <div class="graph-wrap">
+              <svg class="graph-svg" id="svg-scale" viewBox="0 0 320 360" preserveAspectRatio="none">
+                <g id="sg-grid"></g>
+                <g id="sg-marker"></g>
+                <g id="sg-hairlines"></g>
+                <path class="g-path" id="sg-path" />
+                <circle class="g-knob" id="sg-k1" r="4.5" />
+                <circle class="g-knob" id="sg-k2" r="4.5" />
+                <text class="g-label" id="sg-lbl1"></text>
+                <text class="g-label" id="sg-lbl2"></text>
+              </svg>
+            </div>
+            <div class="graph-status">
+              <span class="graph-status-label">Computed map scale at map center</span>
+              <span class="graph-status-value" id="sg-status">--</span>
+            </div>
+            <div class="graph-status">
+              <span class="graph-status-label">Scale-based VE factor</span>
+              <span class="graph-status-value" id="sg-factor-status">--</span>
+            </div>
+            <div class="graph-inputs">
+              <label>Scale denominator (1:n)</label>
+              <div class="graph-input-pair">
+                <input type="number" class="rl-num" id="sn-x1" />
+                <input type="number" class="rl-num" id="sn-x2" />
+              </div>
+              <label>VA factor</label>
+              <div class="graph-input-pair">
+                <input type="number" class="rl-num" id="sn-y1" step="0.1" />
+                <input type="number" class="rl-num" id="sn-y2" step="0.1" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="check-row">
+            <input type="checkbox" class="rl-check" id="chk-elev-ve" />
+            <label class="check-label" for="chk-elev-ve" style="font-weight:500;">Elevation-based vertical exaggeration</label>
+          </div>
+          <div class="row-note" style="margin: 0 0 12px;">
+            Vertical exaggeration factor, depending on elevation in
+            meters above sea level.
+          </div>
+          <div id="graph-elev-gate">
+            <div class="graph-wrap">
+              <svg class="graph-svg" id="svg-elev" viewBox="0 0 320 360" preserveAspectRatio="none">
+                <g id="eg-grid"></g>
+                <g id="eg-hairlines"></g>
+                <path class="g-path" id="eg-path" />
+                <circle class="g-knob" id="eg-k1" r="4.5" />
+                <circle class="g-knob" id="eg-k2" r="4.5" />
+                <text class="g-label" id="eg-lbl1"></text>
+                <text class="g-label" id="eg-lbl2"></text>
+              </svg>
+            </div>
+            <div class="graph-inputs">
+              <label>Elevation (m)</label>
+              <div class="graph-input-pair">
+                <input type="number" class="rl-num" id="en-x1" />
+                <input type="number" class="rl-num" id="en-x2" />
+              </div>
+              <label>VA factor</label>
+              <div class="graph-input-pair">
+                <input type="number" class="rl-num" id="en-y1" step="0.1" />
+                <input type="number" class="rl-num" id="en-y2" step="0.1" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="row" id="row-ppi">
+            <span class="row-label">Device PPI</span>
+            <div class="row-control">
+              <input type="number" class="rl-num" id="ve-ppi" min="1" max="1200" step="1" />
+            </div>
+          </div>
+          <div class="row-note row-note-offset">
+            The true scale at map center is determined by the device
+            physical CSS PPI. Set it accordingly for more accurate
+            scale-based vertical exaggeration settings and scale
+            readings.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Tab 3: Options ────────────────────────────────── -->
+      <div class="tab-pane" id="pane-opts">
+        <div class="section">
+          <div class="section-title">Rendering</div>
+          <div id="opts-list"></div>
+        </div>
+      </div>
+
+    </div><!-- /tab-content -->
+
+  </div><!-- /panel -->
+
+  <button id="panel-toggle" title="Toggle panel">◀</button>
+
+  <div id="map"></div>
+</div>
+
+<script>
+'use strict';
+
+/* ── helpers ─────────────────────────────────────────────── */
+
+function hexToRgb01(hex) {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255];
+}
+
+function rgb01ToHex(rgb) {
+  const c = rgb.map(v => Math.round(Math.max(0, Math.min(1, v)) * 255));
+  return '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+function hexToRgb255(hex) {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return [(n >> 16 & 255), (n >> 8 & 255), (n & 255)];
+}
+
+function rgb255ToHex(rgb) {
+  return '#' + rgb.map(
+    v => Math.round(Math.max(0, Math.min(255, v)))
+      .toString(16).padStart(2, '0')).join('');
+}
+
+function fmtScaleDenominator(v) {
+  const abs = Math.abs(v);
+  const fmtSig = n => Number.parseFloat(n.toPrecision(3)).toString();
+
+  if (abs >= 1000000) {
+    return '1:' + fmtSig(v / 1000000) + 'M';
+  }
+
+  if (abs >= 1000) {
+    return '1:' + fmtSig(v / 1000) + 'k';
+  }
+
+  return '1:' + fmtSig(v);
+}
+
+function fmtScaleDenominatorReadable(v) {
+  const abs = Math.abs(v);
+  const fmtSig = n => Number.parseFloat(n.toPrecision(3)).toString();
+
+  if (abs >= 1000000) {
+    return '1:' + fmtSig(v / 1000000) + ' M';
+  }
+
+  if (abs >= 1000) {
+    return '1:' + fmtSig(v / 1000) + ' k';
+  }
+
+  return '1:' + fmtSig(v);
+}
+
+function syncSliderFill(el) {
+  const ratio = (el.value - el.min) / (el.max - el.min) * 100;
+  el.style.setProperty('--fill', ratio + '%');
+}
+
+/* ── URL / position / style ──────────────────────────────── */
+
+const translationDict = {
+  backend: {
+    dev:  'http://localhost:3071',
+    test: 'http://localhost/mapproxy',
+    prod: 'https://cdn.tspl.re/mapproxy',
+  },
+};
+
+const defaultParams = { backend: 'prod' };
+
+function posFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const pos = params.get('pos');
+  if (!pos) return null;
+  return pos.split(',').map((v, i) => i === 3 ? v : parseFloat(v));
+}
+
+function resolvePlaceholder(identifier, params) {
+  const raw = params.get(identifier) ?? defaultParams[identifier];
+  if (raw == null) return '';
+  const dict = translationDict[identifier];
+  if (!dict) return raw;
+  return Object.prototype.hasOwnProperty.call(dict, raw) ? dict[raw] : raw;
+}
+
+async function loadStyle(params) {
+  const styleParam = params.get('style') || 'https://cdn.tspl.re/libs/cartolina/tests/styles/krkonose.json';
+  const res = await fetch(styleParam);
+  if (!res.ok) throw new Error(`Failed to load style: ${res.status} ${res.statusText}`);
+  const text = await res.text();
+  const expanded = text.replace(/__([a-zA-Z0-9_-]+)__/g, (_, id) => resolvePlaceholder(id, params));
+  return JSON.parse(expanded);
+}
+
+/* ── app state ───────────────────────────────────────────── */
+
+const state = {
+  illum: {
+    useLighting: true,
+    type: 'tracking',
+    azimuth: 315,
+    elevation: 45,
+    ambientCoef: 0.3,
+    diffuseColor: '#ffffff',
+    specularColor: '#999980',
+    lambertianActive: true,  lambertianWeight: 0.75,
+    slopeActive: true,       slopeWeight: 0.25,
+    aspectActive: false,     aspectWeight: 0.0,
+  },
+  ve: {
+    scaleEnabled: false,
+    scale: { x1: 200000, y1: 1.0, x2: 500000, y2: 12.3 },
+    elevEnabled: false,
+    elev:  { x1: 0, y1: 1.5, x2: 4000, y2: 1.3 },
+  },
+  opts: {
+    useLighting: true,
+    useNormalMaps: true,
+    useDiffuseMaps: true,
+    useSpecularMaps: true,
+    useBumpMaps: true,
+    useAtmosphere: true,
+    useShadows: true,
+    useLabels: true,
+  },
+  atm: {
+    maxVisibility: 1000000,
+    visibilityEnabled: true,
+    visibilityToEyeDistance: 5.0,
+    edgeEnabled: true,
+    edgeDistanceToEyeDistance: 1.0,
+  },
+};
+
+const ui = {
+  illum: {},
+  ve: {},
+  atm: {},
+  opts: {},
+};
+
+const interactionLocks = new Set();
+
+function setInteractionLock(key, locked) {
+  if (locked) {
+    interactionLocks.add(key);
+  } else {
+    interactionLocks.delete(key);
+  }
+}
+
+function isInteractionLocked(key) {
+  return interactionLocks.has(key);
+}
+
+function approxEq(a, b, eps = 1e-6) {
+  return Math.abs(a - b) <= eps;
+}
+
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
+function syncCheckbox(el, value) {
+  if (el.checked !== value) {
+    el.checked = value;
+  }
+}
+
+function syncSelectValue(el, value) {
+  if (el.value !== value) {
+    el.value = value;
+  }
+}
+
+function syncColorValue(el, value) {
+  if (el.value.toLowerCase() !== value.toLowerCase()) {
+    el.value = value;
+  }
+}
+
+function syncSliderValue(el, value) {
+  if (!approxEq(parseFloat(el.value), value)) {
+    el.value = value;
+    syncSliderFill(el);
+  }
+}
+
+function syncReadout(id, value) {
+  const el = document.getElementById(id);
+  if (el.textContent !== value) {
+    el.textContent = value;
+  }
+}
+
+function syncNumberValue(el, value) {
+  if (parseFloat(el.value) !== value) {
+    el.value = value;
+  }
+}
+
+function cloneRampState(ramp) {
+  return { x1: ramp.x1, y1: ramp.y1, x2: ramp.x2, y2: ramp.y2 };
+}
+
+function rampEquals(a, b) {
+  return approxEq(a.x1, b.x1)
+      && approxEq(a.y1, b.y1)
+      && approxEq(a.x2, b.x2)
+      && approxEq(a.y2, b.y2);
+}
+
+/* ── API bridges ─────────────────────────────────────────── */
+
+let map = null;
+
+function getActiveShadingWeightKeys() {
+  const keys = [];
+
+  if (state.illum.lambertianActive) keys.push('lambertianWeight');
+  if (state.illum.slopeActive) keys.push('slopeWeight');
+  if (state.illum.aspectActive) keys.push('aspectWeight');
+
+  return keys;
+}
+
+function normalizeActiveShadingWeights(preservedKey = null) {
+  const activeKeys = getActiveShadingWeightKeys();
+
+  if (activeKeys.length === 0) {
+    return;
+  }
+
+  if (activeKeys.length === 1) {
+    state.illum[activeKeys[0]] = 1;
+    return;
+  }
+
+  if (preservedKey && activeKeys.includes(preservedKey)) {
+    const otherKeys = activeKeys.filter(key => key !== preservedKey);
+    const preservedValue = clamp01(state.illum[preservedKey]);
+    const remaining = Math.max(0, 1 - preservedValue);
+    const otherTotal = otherKeys.reduce(
+      (sum, key) => sum + state.illum[key], 0);
+
+    state.illum[preservedKey] = preservedValue;
+
+    if (otherTotal <= 1e-9) {
+      const even = remaining / otherKeys.length;
+      otherKeys.forEach((key, index) => {
+        state.illum[key] = (index === otherKeys.length - 1)
+          ? remaining - even * index
+          : even;
+      });
+      return;
+    }
+
+    let assigned = preservedValue;
+    otherKeys.forEach((key, index) => {
+      if (index === otherKeys.length - 1) {
+        state.illum[key] = 1 - assigned;
+      } else {
+        state.illum[key] = remaining * (state.illum[key] / otherTotal);
+        assigned += state.illum[key];
+      }
+    });
+    return;
+  }
+
+  const total = activeKeys.reduce((sum, key) => sum + state.illum[key], 0);
+
+  if (total <= 1e-9) {
+    const even = 1 / activeKeys.length;
+    activeKeys.forEach((key, index) => {
+      state.illum[key] = (index === activeKeys.length - 1)
+        ? 1 - even * index
+        : even;
+    });
+    return;
+  }
+
+  let assigned = 0;
+  activeKeys.forEach((key, index) => {
+    if (index === activeKeys.length - 1) {
+      state.illum[key] = 1 - assigned;
+    } else {
+      state.illum[key] = state.illum[key] / total;
+      assigned += state.illum[key];
+    }
+  });
+}
+
+function setShadingWeight(changedKey, nextValue) {
+  state.illum[changedKey] = clamp01(nextValue);
+  normalizeActiveShadingWeights(changedKey);
+}
+
+function applyIllumination() {
+  if (!map) return;
+  const s = state.illum;
+
+  map.setIllumination({
+    useLighting: s.useLighting,
+    light: {
+      type: s.type,
+      azimuth: s.azimuth,
+      elevation: s.elevation,
+      diffuseColor:  hexToRgb255(s.diffuseColor),
+      specularColor: hexToRgb255(s.specularColor),
+    },
+    ambientCoef: s.ambientCoef,
+    shadingLambertianWeight: s.lambertianWeight,
+    shadingSlopeWeight:      s.slopeWeight,
+    shadingAspectWeight:     s.aspectWeight,
+  });
+}
+
+function applyVerticalExaggeration() {
+  if (!map) return;
+  const spec = {};
+  if (state.ve.scaleEnabled) {
+    const sc = state.ve.scale;
+    spec.scaleRamp = { min: [sc.x1, sc.y1], max: [sc.x2, sc.y2] };
+  }
+  if (state.ve.elevEnabled) {
+    const el = state.ve.elev;
+    spec.elevationRamp = { min: [el.x1, el.y1], max: [el.x2, el.y2] };
+  }
+  map.setVerticalExaggeration(spec);
+}
+
+function applyRenderingOptions(partial) {
+  if (!map) return;
+  map.setRenderingOptions(partial);
+}
+
+function applyAtmosphere() {
+  if (!map) return;
+
+  const spec = {
+    maxVisibility: state.atm.maxVisibility,
+    visibilityToEyeDistance: state.atm.visibilityEnabled
+      ? state.atm.visibilityToEyeDistance
+      : undefined,
+    edgeDistanceToEyeDistance: state.atm.edgeEnabled
+      ? state.atm.edgeDistanceToEyeDistance
+      : undefined,
+  };
+
+  map.setAtmosphere(spec);
+}
+
+/* ── Tab 1: Illumination UI ──────────────────────────────── */
+
+function wireSliderLock(el, lockKey) {
+  if (!lockKey) return;
+
+  el.addEventListener('pointerdown', () => setInteractionLock(lockKey, true));
+  el.addEventListener('change', () => setInteractionLock(lockKey, false));
+  el.addEventListener('blur', () => setInteractionLock(lockKey, false));
+  window.addEventListener('pointerup', () => setInteractionLock(lockKey, false));
+}
+
+function makeSlider(cfg) {
+  const el = document.createElement('input');
+  el.type = 'range';
+  el.className = 'rl-slider';
+  el.min = cfg.min;
+  el.max = cfg.max;
+  el.step = cfg.step || 1;
+  el.value = cfg.value;
+  syncSliderFill(el);
+  wireSliderLock(el, cfg.lockKey);
+  el.addEventListener('input', () => {
+    syncSliderFill(el);
+    cfg.onChange(parseFloat(el.value));
+  });
+  return el;
+}
+
+function makeSelect(cfg) {
+  const el = document.createElement('select');
+  el.className = 'rl-select';
+  cfg.options.forEach(([val, label]) => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = label;
+    if (val === cfg.value) opt.selected = true;
+    el.appendChild(opt);
+  });
+  el.addEventListener('change', () => cfg.onChange(el.value));
+  return el;
+}
+
+function makeColor(cfg) {
+  const el = document.createElement('input');
+  el.type = 'color';
+  el.className = 'rl-color';
+  el.value = cfg.value;
+  el.addEventListener('input', () => cfg.onChange(el.value));
+  return el;
+}
+
+function buildIllumTab() {
+  const s = state.illum;
+
+  ui.illum.useLightingTop = document.getElementById('chk-illumination-top');
+  ui.illum.useLightingTop.addEventListener('change', e => {
+    s.useLighting = e.target.checked;
+    state.opts.useLighting = e.target.checked;
+    applyIllumination();
+  });
+
+  // type select
+  const typeEl = makeSelect({
+    options: [['tracking', 'Tracking'], ['geographic', 'Geographic']],
+    value: s.type,
+    onChange(v) { s.type = v; applyIllumination(); },
+  });
+  ui.illum.type = typeEl;
+  document.getElementById('ctrl-type').appendChild(typeEl);
+
+  // azimuth
+  const azEl = makeSlider({ min: 0, max: 360, step: 1, value: s.azimuth,
+    lockKey: 'illum-azimuth',
+    onChange(v) { s.azimuth = v; document.getElementById('read-azimuth').textContent = v + '°'; applyIllumination(); } });
+  ui.illum.azimuth = azEl;
+  document.getElementById('ctrl-azimuth').appendChild(azEl);
+  document.getElementById('read-azimuth').textContent = s.azimuth + '°';
+
+  // elevation
+  const elEl = makeSlider({ min: 0, max: 90, step: 1, value: s.elevation,
+    lockKey: 'illum-elevation',
+    onChange(v) { s.elevation = v; document.getElementById('read-elevation').textContent = v + '°'; applyIllumination(); } });
+  ui.illum.elevation = elEl;
+  document.getElementById('ctrl-elevation').appendChild(elEl);
+  document.getElementById('read-elevation').textContent = s.elevation + '°';
+
+  // ambient
+  const amEl = makeSlider({ min: 0, max: 100, step: 1,
+    lockKey: 'illum-ambient',
+    value: Math.round(s.ambientCoef * 100),
+    onChange(v) { s.ambientCoef = v / 100; document.getElementById('read-ambient').textContent = (v / 100).toFixed(2); applyIllumination(); } });
+  ui.illum.ambient = amEl;
+  document.getElementById('ctrl-ambient').appendChild(amEl);
+  document.getElementById('read-ambient').textContent = s.ambientCoef.toFixed(2);
+
+  // diffuse color
+  const diffuseEl = makeColor({
+    value: s.diffuseColor,
+    onChange(v) { s.diffuseColor = v; applyIllumination(); },
+  });
+  ui.illum.diffuseColor = diffuseEl;
+  document.getElementById('ctrl-diffuse').appendChild(diffuseEl);
+
+  // specular color
+  const specularEl = makeColor({
+    value: s.specularColor,
+    onChange(v) { s.specularColor = v; applyIllumination(); },
+  });
+  ui.illum.specularColor = specularEl;
+  document.getElementById('ctrl-specular').appendChild(specularEl);
+
+  // shading checkboxes + weight sliders
+  function makeShadingSlider(stateKey, ctrlId, readId, lockKey, refKey) {
+    const sl = makeSlider({ min: 0, max: 100, step: 1,
+      lockKey,
+      value: Math.round(state.illum[stateKey] * 100),
+      onChange(v) {
+        setShadingWeight(stateKey, v / 100);
+        syncIlluminationUi();
+        applyIllumination();
+      } });
+    ui.illum[refKey] = sl;
+    document.getElementById(ctrlId).appendChild(sl);
+    document.getElementById(readId).textContent = state.illum[stateKey].toFixed(2);
+    return sl;
+  }
+
+  makeShadingSlider('lambertianWeight', 'ctrl-lambertian-w',
+    'read-lambertian-w', 'illum-lambertian-weight', 'lambertianWeight');
+  makeShadingSlider('slopeWeight', 'ctrl-slope-w',
+    'read-slope-w', 'illum-slope-weight', 'slopeWeight');
+  makeShadingSlider('aspectWeight', 'ctrl-aspect-w',
+    'read-aspect-w', 'illum-aspect-weight', 'aspectWeight');
+
+  // initially disable aspect weight row
+  document.getElementById('row-aspect-w-controls').classList.add('disabled');
+
+  function wireCheck(id, activeKey, controlsId, optionKey) {
+    document.getElementById(id).addEventListener('change', e => {
+      state.illum[activeKey] = e.target.checked;
+      normalizeActiveShadingWeights(
+        e.target.checked ? activeKey.replace('Active', 'Weight') : null);
+      document.getElementById(controlsId).classList.toggle('disabled', !e.target.checked);
+      syncIlluminationUi();
+      applyIllumination();
+      applyRenderingOptions({ [optionKey]: e.target.checked });
+    });
+  }
+
+  ui.illum.lambertianActive = document.getElementById('chk-lambertian');
+  ui.illum.slopeActive = document.getElementById('chk-slope');
+  ui.illum.aspectActive = document.getElementById('chk-aspect');
+
+  wireCheck('chk-lambertian', 'lambertianActive', 'row-lambertian-w-controls',
+    'useShadingLambertian');
+  wireCheck('chk-slope', 'slopeActive', 'row-slope-w-controls',
+    'useShadingSlope');
+  wireCheck('chk-aspect', 'aspectActive', 'row-aspect-w-controls',
+    'useShadingAspect');
+
+  ui.atm.useAtmosphereTop = document.getElementById('chk-atmosphere-top');
+  ui.atm.useAtmosphereTop.addEventListener('change', e => {
+    state.opts.useAtmosphere = e.target.checked;
+    applyRenderingOptions({ useAtmosphere: e.target.checked });
+  });
+
+  ui.atm.visibilityToEyeDistance = makeSlider({
+    min: 1,
+    max: 10,
+    step: 0.1,
+    value: state.atm.visibilityToEyeDistance,
+    lockKey: 'atm-visibility-factor',
+    onChange(v) {
+      state.atm.visibilityToEyeDistance = v;
+      syncReadout('read-atm-visibility-factor', v.toFixed(2));
+      applyAtmosphere();
+    }
+  });
+  document.getElementById('ctrl-atm-visibility-factor')
+    .appendChild(ui.atm.visibilityToEyeDistance);
+
+  ui.atm.edgeDistanceToEyeDistance = makeSlider({
+    min: 0,
+    max: 3,
+    step: 0.1,
+    value: state.atm.edgeDistanceToEyeDistance,
+    lockKey: 'atm-edge-factor',
+    onChange(v) {
+      state.atm.edgeDistanceToEyeDistance = v;
+      syncReadout('read-atm-edge-factor', v.toFixed(2));
+      applyAtmosphere();
+    }
+  });
+  document.getElementById('ctrl-atm-edge-factor')
+    .appendChild(ui.atm.edgeDistanceToEyeDistance);
+
+  ui.atm.visibilityEnabled = document.getElementById(
+    'chk-atm-visibility-factor');
+  ui.atm.edgeEnabled = document.getElementById('chk-atm-edge-factor');
+
+  ui.atm.visibilityEnabled.addEventListener('change', e => {
+    state.atm.visibilityEnabled = e.target.checked;
+    applyAtmosphere();
+    syncAtmosphereUi();
+  });
+
+  ui.atm.edgeEnabled.addEventListener('change', e => {
+    state.atm.edgeEnabled = e.target.checked;
+    applyAtmosphere();
+    syncAtmosphereUi();
+  });
+}
+
+/* ── Graph widget (reusable) ─────────────────────────────── */
+
+function makeRampGraph(cfg) {
+  /*
+   * cfg = {
+   *   svgId, gridId, hairlineId, pathId, k1Id, k2Id, lbl1Id, lbl2Id,
+   *   logX, logY,          // bool: use log scale on that axis
+   *   xMin, xMax, yMin, yMax,
+   *   state,               // { x1, y1, x2, y2 } — mutated in place
+   *   n1Id, n2Id, n3Id, n4Id,  // numeric input element ids
+   *   onChange,
+   * }
+   */
+
+  const W = 320, H = 360, PAD = 30;
+  const g = cfg;
+
+  function toLog(v, lo, hi) {
+    return (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo));
+  }
+
+  function fromLog(t, lo, hi) {
+    return Math.exp(Math.log(lo) + t * (Math.log(hi) - Math.log(lo)));
+  }
+
+  function toSX(v) {
+    const t = g.logX ? toLog(v, g.xMin, g.xMax) : (v - g.xMin) / (g.xMax - g.xMin);
+    return PAD + t * (W - 2 * PAD);
+  }
+
+  function toSY(v) {
+    const t = g.logY ? toLog(v, g.yMin, g.yMax) : (v - g.yMin) / (g.yMax - g.yMin);
+    return (H - PAD) - t * (H - 2 * PAD);
+  }
+
+  function fromSX(sx) {
+    const t = (sx - PAD) / (W - 2 * PAD);
+    return g.logX ? fromLog(Math.max(0.0001, Math.min(1, t)), g.xMin, g.xMax)
+                  : g.xMin + t * (g.xMax - g.xMin);
+  }
+
+  function fromSY(sy) {
+    const t = ((H - PAD) - sy) / (H - 2 * PAD);
+    return g.logY ? fromLog(Math.max(0.0001, Math.min(1, t)), g.yMin, g.yMax)
+                  : g.yMin + t * (g.yMax - g.yMin);
+  }
+
+  function logTicks(lo, hi) {
+    const ticks = [];
+    const p0 = Math.floor(Math.log10(lo));
+    const p1 = Math.ceil(Math.log10(hi));
+    for (let p = p0; p <= p1; p++) {
+      for (const m of [1, 2, 5]) {
+        const v = m * Math.pow(10, p);
+        if (v >= lo && v <= hi) ticks.push(v);
+      }
+    }
+    return ticks;
+  }
+
+  function linTicks(lo, hi, count) {
+    const raw = (hi - lo) / count;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const nice = [1, 2, 2.5, 5, 10].find(f => f * mag >= raw) * mag;
+    const ticks = [];
+    let v = Math.ceil(lo / nice) * nice;
+    while (v <= hi + 1e-9) { ticks.push(parseFloat(v.toFixed(10))); v += nice; }
+    return ticks;
+  }
+
+  function fmtTick(v) {
+    if (Math.abs(v) >= 10000) return (v / 1000).toFixed(0) + 'k';
+    if (Math.abs(v) >= 1000)  return (v / 1000).toFixed(0) + 'k';
+    if (Number.isInteger(v))  return v.toString();
+    return v.toPrecision(2);
+  }
+
+  function drawGrid() {
+    const gridEl = document.getElementById(g.gridId);
+    let html = '';
+
+    const xTicks = g.xTicks
+      ? g.xTicks
+      : (g.logX ? logTicks(g.xMin, g.xMax) : linTicks(g.xMin, g.xMax, 5));
+    for (const v of xTicks) {
+      const sx = toSX(v);
+      html += `<line class="g-grid" x1="${sx}" y1="${PAD}" x2="${sx}" y2="${H - PAD}"/>`;
+      html += `<text class="g-tick" x="${sx}" y="${H - PAD + 12}" text-anchor="middle">${(g.xTickFormatter || fmtTick)(v)}</text>`;
+    }
+
+    const yTicks = g.yTicks
+      ? g.yTicks
+      : (g.logY ? logTicks(g.yMin, g.yMax) : linTicks(g.yMin, g.yMax, 4));
+    for (const v of yTicks) {
+      const sy = toSY(v);
+      html += `<line class="g-grid" x1="${PAD}" y1="${sy}" x2="${W - PAD}" y2="${sy}"/>`;
+      html += `<text class="g-tick" x="${PAD - 4}" y="${sy + 3}" text-anchor="end">${(g.yTickFormatter || fmtTick)(v)}</text>`;
+    }
+
+    // axes
+    html += `<line class="g-axis" x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H - PAD}"/>`;
+    html += `<line class="g-axis" x1="${PAD}" y1="${H - PAD}" x2="${W - PAD}" y2="${H - PAD}"/>`;
+
+    gridEl.innerHTML = html;
+  }
+
+  function draw() {
+    const s = g.state;
+    const x1s = toSX(s.x1), y1s = toSY(s.y1);
+    const x2s = toSX(s.x2), y2s = toSY(s.y2);
+    const x0s = toSX(g.xMin), xEs = toSX(g.xMax);
+    let lbl1Dx = 8;
+    let lbl1Dy = -8;
+    let lbl1Anchor = 'start';
+    let lbl2Dx = 8;
+    let lbl2Dy = -8;
+    let lbl2Anchor = 'start';
+
+    if (s.y2 > s.y1) {
+      lbl1Dx = 8;
+      lbl1Dy = 16;
+      lbl1Anchor = 'start';
+      lbl2Dx = -8;
+      lbl2Dy = -8;
+      lbl2Anchor = 'end';
+    } else if (s.y2 < s.y1) {
+      lbl1Dx = 8;
+      lbl1Dy = -8;
+      lbl1Anchor = 'start';
+      lbl2Dx = -8;
+      lbl2Dy = 16;
+      lbl2Anchor = 'end';
+    }
+
+    document.getElementById(g.pathId).setAttribute('d',
+      `M${x0s} ${y1s} L${x1s} ${y1s} L${x2s} ${y2s} L${xEs} ${y2s}`);
+
+    document.getElementById(g.k1Id).setAttribute('cx', x1s);
+    document.getElementById(g.k1Id).setAttribute('cy', y1s);
+    document.getElementById(g.k2Id).setAttribute('cx', x2s);
+    document.getElementById(g.k2Id).setAttribute('cy', y2s);
+
+    const lbl1 = document.getElementById(g.lbl1Id);
+    lbl1.setAttribute('x', x1s + lbl1Dx);
+    lbl1.setAttribute('y', y1s + lbl1Dy);
+    lbl1.setAttribute('text-anchor', lbl1Anchor);
+    lbl1.textContent = (g.xValueFormatter || fmtTick)(s.x1)
+      + ', ' + s.y1.toFixed(2);
+
+    const lbl2 = document.getElementById(g.lbl2Id);
+    lbl2.setAttribute('x', x2s + lbl2Dx);
+    lbl2.setAttribute('y', y2s + lbl2Dy);
+    lbl2.setAttribute('text-anchor', lbl2Anchor);
+    lbl2.textContent = (g.xValueFormatter || fmtTick)(s.x2)
+      + ', ' + s.y2.toFixed(2);
+
+    const hlEl = document.getElementById(g.hairlineId);
+    hlEl.innerHTML =
+      `<line class="g-hairline" x1="${x1s}" y1="${y1s}" x2="${x1s}" y2="${H - PAD}"/>` +
+      `<line class="g-hairline" x1="${x2s}" y1="${y2s}" x2="${x2s}" y2="${H - PAD}"/>`;
+
+    if (g.currentX !== undefined && g.markerId) {
+      const markerX = toSX(Math.max(g.xMin, Math.min(g.xMax, g.currentX)));
+      const handleY = PAD + (H - 2 * PAD) * 0.5;
+      const handleSize = 6;
+      document.getElementById(g.markerId).innerHTML =
+        `<line class="g-marker" x1="${markerX}" y1="${PAD}" x2="${markerX}" y2="${H - PAD}"/>`
+        + `<polygon class="g-marker-handle" points="${
+          markerX
+        },${
+          handleY - handleSize
+        } ${
+          markerX + handleSize
+        },${
+          handleY
+        } ${
+          markerX
+        },${
+          handleY + handleSize
+        } ${
+          markerX - handleSize
+        },${
+          handleY
+        }"/>`
+        + `<line class="g-marker-hit" x1="${markerX}" y1="${PAD}" x2="${markerX}" y2="${H - PAD}"/>`;
+    }
+
+    // sync numeric inputs
+    document.getElementById(g.n1Id).value = Math.round(s.x1);
+    document.getElementById(g.n2Id).value = Math.round(s.x2);
+    document.getElementById(g.n3Id).value = s.y1.toFixed(2);
+    document.getElementById(g.n4Id).value = s.y2.toFixed(2);
+  }
+
+  function setCurrentX(value) {
+    g.currentX = value;
+    draw();
+  }
+
+  drawGrid();
+  draw();
+
+  // drag interaction
+  const svgEl = document.getElementById(g.svgId);
+  let active = null;
+
+  svgEl.addEventListener('mousedown', e => {
+    const bounds = svgEl.getBoundingClientRect();
+    const mx = ((e.clientX - bounds.left) / bounds.width) * W;
+    const my = ((e.clientY - bounds.top) / bounds.height) * H;
+    const s = g.state;
+    const d1 = Math.hypot(mx - toSX(s.x1), my - toSY(s.y1));
+    const d2 = Math.hypot(mx - toSX(s.x2), my - toSY(s.y2));
+    if (d1 < 20) {
+      active = 1;
+      setInteractionLock(g.lockKey, true);
+      document.getElementById(g.k1Id).classList.add('drag');
+    }
+    else if (d2 < 20) {
+      active = 2;
+      setInteractionLock(g.lockKey, true);
+      document.getElementById(g.k2Id).classList.add('drag');
+    }
+    else if (g.currentX !== undefined && g.onMarkerChange
+        && my >= PAD && my <= H - PAD) {
+      const markerX = toSX(Math.max(g.xMin, Math.min(g.xMax, g.currentX)));
+      if (Math.abs(mx - markerX) < 10) {
+        active = 'marker';
+        setInteractionLock(g.markerLockKey || g.lockKey, true);
+      }
+    }
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!active) return;
+    const bounds = svgEl.getBoundingClientRect();
+    const mx = ((e.clientX - bounds.left) / bounds.width) * W;
+    const my = ((e.clientY - bounds.top) / bounds.height) * H;
+    const s = g.state;
+    const vx = Math.max(g.xMin, Math.min(g.xMax, fromSX(mx)));
+    const vy = Math.max(g.yMin, Math.min(g.yMax, fromSY(my)));
+    if (active === 'marker') {
+      setCurrentX(vx);
+      g.onMarkerChange(vx);
+      return;
+    }
+
+    if (active === 1) {
+      s.x1 = Math.min(vx, s.x2 * 0.99);
+      s.y1 = vy;
+    } else {
+      s.x2 = Math.max(vx, s.x1 * 1.01);
+      s.y2 = vy;
+    }
+    draw();
+    g.onChange();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (active) {
+      if (active === 1 || active === 2) {
+        document.getElementById(
+          active === 1 ? g.k1Id : g.k2Id
+        ).classList.remove('drag');
+      }
+      active = null;
+      setInteractionLock(g.markerLockKey || g.lockKey, false);
+      setInteractionLock(g.lockKey, false);
+    }
+  });
+
+  // numeric input sync
+  function wireNum(id, setter) {
+    const el = document.getElementById(id);
+    el.addEventListener('focus', () => setInteractionLock(g.lockKey, true));
+    el.addEventListener('change', e => {
+      setter(parseFloat(e.target.value));
+      const s = g.state;
+      if (s.x1 >= s.x2) s.x1 = s.x2 * 0.99;
+      draw();
+      setInteractionLock(g.lockKey, false);
+      g.onChange();
+    });
+    el.addEventListener('blur', () => setInteractionLock(g.lockKey, false));
+  }
+
+  wireNum(g.n1Id, v => { g.state.x1 = Math.max(g.xMin, Math.min(g.xMax, v)); });
+  wireNum(g.n2Id, v => { g.state.x2 = Math.max(g.xMin, Math.min(g.xMax, v)); });
+  wireNum(g.n3Id, v => { g.state.y1 = Math.max(g.yMin, Math.min(g.yMax, v)); });
+  wireNum(g.n4Id, v => { g.state.y2 = Math.max(g.yMin, Math.min(g.yMax, v)); });
+
+  return {
+    redraw: draw,
+    setCurrentX,
+  };
+}
+
+/* ── Tab 2: Vertical Exaggeration UI ────────────────────── */
+
+let scaleGraph = null;
+let elevGraph  = null;
+
+function getLiveRendererPpi() {
+  if (!map) {
+    return 96;
+  }
+
+  const value = map.getParam('rendererCssDpi');
+  return Number.isFinite(value) ? value : 96;
+}
+
+function applyPpiValue() {
+  const value = parseFloat(ui.ve.ppi.value);
+
+  if (!map || !Number.isFinite(value) || value <= 0) {
+    syncNumberValue(ui.ve.ppi, getLiveRendererPpi());
+    setInteractionLock('ve-ppi', false);
+    return;
+  }
+
+  map.setParam('rendererCssDpi', value);
+  map.redraw();
+  updateComputedScaleIndicator();
+  setInteractionLock('ve-ppi', false);
+}
+
+function revertPpiDraft() {
+  syncNumberValue(ui.ve.ppi, getLiveRendererPpi());
+  setInteractionLock('ve-ppi', false);
+}
+
+function setMapScaleDenominator(targetScale) {
+  if (!map || !Number.isFinite(targetScale) || targetScale <= 0) {
+    return;
+  }
+
+  const position = map.getPosition();
+  const currentExtent = position.getViewExtent();
+  const currentScale = map.getScaleDenominator(currentExtent);
+
+  if (!Number.isFinite(currentScale) || currentScale <= 0) {
+    return;
+  }
+
+  position.setViewExtent(currentExtent * (targetScale / currentScale));
+  map.setPosition(position);
+}
+
+function buildVeTab() {
+  ui.ve.ppi = document.getElementById('ve-ppi');
+
+  ui.ve.ppi.addEventListener('focus', () => {
+    setInteractionLock('ve-ppi', true);
+  });
+
+  ui.ve.ppi.addEventListener('input', () => {
+    setInteractionLock('ve-ppi', true);
+  });
+
+  ui.ve.ppi.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      applyPpiValue();
+      ui.ve.ppi.blur();
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      revertPpiDraft();
+      ui.ve.ppi.blur();
+    }
+  });
+
+  ui.ve.ppi.addEventListener('blur', () => {
+    applyPpiValue();
+  });
+
+  // scale ramp — log/log
+  scaleGraph = makeRampGraph({
+    svgId: 'svg-scale',    gridId: 'sg-grid',    hairlineId: 'sg-hairlines',
+    pathId: 'sg-path',     k1Id: 'sg-k1',        k2Id: 'sg-k2',
+    lbl1Id: 'sg-lbl1',    lbl2Id: 'sg-lbl2',
+    logX: true,            logY: true,
+    lockKey: 've-scale',
+    xMin: 8000, xMax: 125000000, yMin: 0.5, yMax: 128,
+    xTicks: [8000, 40000, 200000, 1000000, 5000000, 25000000, 125000000],
+    xTickFormatter: fmtScaleDenominator,
+    xValueFormatter: fmtScaleDenominator,
+    markerId: 'sg-marker',
+    markerLockKey: 've-scale-marker',
+    onMarkerChange: setMapScaleDenominator,
+    yTicks: [0.5, 1, 2, 4, 8, 16, 32, 64, 128],
+    state: state.ve.scale,
+    n1Id: 'sn-x1', n2Id: 'sn-x2', n3Id: 'sn-y1', n4Id: 'sn-y2',
+    onChange: applyVerticalExaggeration,
+  });
+
+  // elevation ramp — linear/linear
+  elevGraph = makeRampGraph({
+    svgId: 'svg-elev',    gridId: 'eg-grid',    hairlineId: 'eg-hairlines',
+    pathId: 'eg-path',    k1Id: 'eg-k1',        k2Id: 'eg-k2',
+    lbl1Id: 'eg-lbl1',   lbl2Id: 'eg-lbl2',
+    logX: false,          logY: false,
+    lockKey: 've-elev',
+    xMin: -1000, xMax: 10000, yMin: 0.5, yMax: 3.0,
+    xTicks: [0, 2000, 4000, 6000, 8000, 10000],
+    yTicks: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0],
+    state: state.ve.elev,
+    n1Id: 'en-x1', n2Id: 'en-x2', n3Id: 'en-y1', n4Id: 'en-y2',
+    onChange: applyVerticalExaggeration,
+  });
+
+  // gate checkboxes
+  function wireVeCheck(chkId, stateKey, gateId) {
+    const chk = document.getElementById(chkId);
+    const gate = document.getElementById(gateId);
+    gate.classList.add('disabled');
+    chk.addEventListener('change', e => {
+      state.ve[stateKey] = e.target.checked;
+      gate.classList.toggle('disabled', !e.target.checked);
+      applyVerticalExaggeration();
+    });
+  }
+
+  ui.ve.scaleEnabled = document.getElementById('chk-scale-ve');
+  ui.ve.elevEnabled = document.getElementById('chk-elev-ve');
+
+  wireVeCheck('chk-scale-ve', 'scaleEnabled', 'graph-scale-gate');
+  wireVeCheck('chk-elev-ve',  'elevEnabled',  'graph-elev-gate');
+}
+
+/* ── Tab 3: Options UI ───────────────────────────────────── */
+
+function buildOptsTab() {
+  const items = [
+    { label: 'Illumination (lighting)', key: 'useLighting', stateObj: state.opts,
+      description: 'Enables light for shading via the Blinn-Phong lighting model.',
+      apply() { state.illum.useLighting = state.opts.useLighting; applyIllumination(); } },
+    { label: 'Normal maps',      key: 'useNormalMaps',   stateObj: state.opts,
+      description: 'Uses server-side terrain normal maps instead of mere geometry derivatives.',
+      apply() { applyRenderingOptions({ useNormalMaps:   state.opts.useNormalMaps   }); } },
+    { label: 'Diffuse maps (textures)', key: 'useDiffuseMaps', stateObj: state.opts,
+      description: 'Uses style-defined diffuse-map layers for texturing.',
+      apply() { applyRenderingOptions({ useDiffuseMaps:  state.opts.useDiffuseMaps  }); } },
+    { label: 'Specular maps',    key: 'useSpecularMaps', stateObj: state.opts,
+      description: 'Uses style-defined specular-map layers for specular reflections.',
+      apply() { applyRenderingOptions({ useSpecularMaps: state.opts.useSpecularMaps }); } },
+    { label: 'Bump maps',        key: 'useBumpMaps',     stateObj: state.opts,
+      description: 'Uses style-defined bump maps for normal-map undulation.',
+      apply() { applyRenderingOptions({ useBumpMaps:     state.opts.useBumpMaps     }); } },
+    { label: 'Haze (atmosphere)',key: 'useAtmosphere',   stateObj: state.opts,
+      description: 'Enables atmospheric haze and aerial perspective.',
+      apply() { applyRenderingOptions({ useAtmosphere:   state.opts.useAtmosphere   }); } },
+    { label: 'Foreground shadows', key: 'useShadows',   stateObj: state.opts,
+      description: 'Adds progressive shadows in the foreground.',
+      apply() { applyRenderingOptions({ useShadows:      state.opts.useShadows      }); } },
+    { label: 'Labels',            key: 'useLabels',     stateObj: state.opts,
+      description: 'Render style-defined labels.',
+      apply() { applyRenderingOptions({ useLabels:       state.opts.useLabels       }); } },
+  ];
+
+  const list = document.getElementById('opts-list');
+  items.forEach(item => {
+    const id = 'opt-' + item.key;
+    const row = document.createElement('div');
+    row.className = 'option-row';
+
+    const chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.className = 'rl-check';
+    chk.id = id;
+    chk.checked = item.stateObj[item.key];
+    chk.addEventListener('change', e => {
+      item.stateObj[item.key] = e.target.checked;
+      item.apply();
+    });
+
+    ui.opts[item.key] = chk;
+
+    const lbl = document.createElement('label');
+    lbl.className = 'check-label';
+    lbl.htmlFor = id;
+    lbl.textContent = item.label;
+
+    const copy = document.createElement('div');
+    copy.className = 'option-copy';
+    copy.appendChild(lbl);
+
+    const desc = document.createElement('div');
+    desc.className = 'option-description';
+    desc.textContent = item.description;
+    copy.appendChild(desc);
+
+    row.appendChild(chk);
+    row.appendChild(copy);
+    list.appendChild(row);
+  });
+}
+
+/* ── Tab switching ───────────────────────────────────────── */
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('pane-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── Panel collapse ──────────────────────────────────────── */
+
+const panelEl = document.getElementById('panel');
+const toggleBtn = document.getElementById('panel-toggle');
+let expandedPanelWidth = 0;
+
+function measureExpandedPanelWidth() {
+  if (panelEl.classList.contains('collapsed')) {
+    return;
+  }
+
+  expandedPanelWidth = panelEl.getBoundingClientRect().width;
+}
+
+function updateTogglePos() {
+  measureExpandedPanelWidth();
+  const left = panelEl.classList.contains('collapsed')
+    ? 0
+    : expandedPanelWidth;
+  toggleBtn.style.left = left + 'px';
+}
+
+toggleBtn.addEventListener('click', () => {
+  const collapsed = panelEl.classList.toggle('collapsed');
+  toggleBtn.textContent = collapsed ? '▶' : '◀';
+  updateTogglePos();
+});
+
+panelEl.addEventListener('transitionend', updateTogglePos);
+window.addEventListener('resize', updateTogglePos);
+
+// set initial position once layout is ready
+requestAnimationFrame(updateTogglePos);
+
+/* ── Main ────────────────────────────────────────────────── */
+
+function syncIlluminationUi() {
+  syncCheckbox(ui.illum.useLightingTop, state.illum.useLighting);
+  document.getElementById('illum-pane-controls').classList.toggle('disabled',
+    !state.illum.useLighting);
+  syncSelectValue(ui.illum.type, state.illum.type);
+  syncSliderValue(ui.illum.azimuth, state.illum.azimuth);
+  syncSliderValue(ui.illum.elevation, state.illum.elevation);
+  syncSliderValue(ui.illum.ambient, Math.round(state.illum.ambientCoef * 100));
+  syncColorValue(ui.illum.diffuseColor, state.illum.diffuseColor);
+  syncColorValue(ui.illum.specularColor, state.illum.specularColor);
+  syncSliderValue(ui.illum.lambertianWeight,
+    Math.round(state.illum.lambertianWeight * 100));
+  syncSliderValue(ui.illum.slopeWeight,
+    Math.round(state.illum.slopeWeight * 100));
+  syncSliderValue(ui.illum.aspectWeight,
+    Math.round(state.illum.aspectWeight * 100));
+  syncCheckbox(ui.illum.lambertianActive, state.illum.lambertianActive);
+  syncCheckbox(ui.illum.slopeActive, state.illum.slopeActive);
+  syncCheckbox(ui.illum.aspectActive, state.illum.aspectActive);
+  document.getElementById('row-lambertian-w-controls').classList.toggle('disabled',
+    !state.illum.lambertianActive);
+  document.getElementById('row-slope-w-controls').classList.toggle('disabled',
+    !state.illum.slopeActive);
+  document.getElementById('row-aspect-w-controls').classList.toggle('disabled',
+    !state.illum.aspectActive);
+  syncReadout('read-azimuth', state.illum.azimuth + '°');
+  syncReadout('read-elevation', state.illum.elevation + '°');
+  syncReadout('read-ambient', state.illum.ambientCoef.toFixed(2));
+  syncReadout('read-lambertian-w', state.illum.lambertianWeight.toFixed(2));
+  syncReadout('read-slope-w', state.illum.slopeWeight.toFixed(2));
+  syncReadout('read-aspect-w', state.illum.aspectWeight.toFixed(2));
+}
+
+function syncAtmosphereUi() {
+  syncCheckbox(ui.atm.useAtmosphereTop, state.opts.useAtmosphere);
+  document.getElementById('atmos-pane-controls').classList.toggle(
+    'disabled',
+    !state.opts.useAtmosphere);
+
+  syncCheckbox(ui.atm.visibilityEnabled, state.atm.visibilityEnabled);
+  syncCheckbox(ui.atm.edgeEnabled, state.atm.edgeEnabled);
+  syncSliderValue(
+    ui.atm.visibilityToEyeDistance,
+    state.atm.visibilityToEyeDistance);
+  syncSliderValue(
+    ui.atm.edgeDistanceToEyeDistance,
+    state.atm.edgeDistanceToEyeDistance);
+  document.getElementById('row-atm-visibility-factor-controls')
+    .classList.toggle('disabled', !state.atm.visibilityEnabled);
+  document.getElementById('row-atm-edge-factor-controls')
+    .classList.toggle('disabled', !state.atm.edgeEnabled);
+  syncReadout(
+    'read-atm-visibility-factor',
+    state.atm.visibilityToEyeDistance.toFixed(2));
+  syncReadout(
+    'read-atm-edge-factor',
+    state.atm.edgeDistanceToEyeDistance.toFixed(2));
+}
+
+function syncVeUi() {
+  syncCheckbox(ui.ve.scaleEnabled, state.ve.scaleEnabled);
+  syncCheckbox(ui.ve.elevEnabled, state.ve.elevEnabled);
+  if (!isInteractionLocked('ve-ppi')) {
+    syncNumberValue(ui.ve.ppi, getLiveRendererPpi());
+  }
+  document.getElementById('graph-scale-gate').classList.toggle('disabled',
+    !state.ve.scaleEnabled);
+  document.getElementById('graph-elev-gate').classList.toggle('disabled',
+    !state.ve.elevEnabled);
+  scaleGraph.redraw();
+  elevGraph.redraw();
+}
+
+function syncOptsUi() {
+  Object.keys(ui.opts).forEach(key => {
+    syncCheckbox(ui.opts[key], state.opts[key]);
+  });
+}
+
+function updateComputedScaleIndicator() {
+  if (!map || !scaleGraph) return;
+
+  const position = map.getPosition();
+  const currentScale = map.getScaleDenominator(position.getViewExtent());
+  const currentVeScaleFactor = map.getVeScaleFactor(position);
+  scaleGraph.setCurrentX(currentScale);
+  document.getElementById('sg-status').textContent =
+    fmtScaleDenominatorReadable(currentScale);
+  document.getElementById('sg-factor-status').textContent =
+    Number.parseFloat(currentVeScaleFactor.toPrecision(3)).toString();
+}
+
+function syncIlluminationFromMap() {
+  const illumination = map.getIllumination();
+  if (!illumination || !illumination.light || Array.isArray(illumination.light)) {
+    return;
+  }
+
+  if (!isInteractionLocked('illum-azimuth')) {
+    state.illum.azimuth = illumination.light.azimuth;
+  }
+
+  if (!isInteractionLocked('illum-elevation')) {
+    state.illum.elevation = illumination.light.elevation;
+  }
+
+  if (!isInteractionLocked('illum-ambient')) {
+    state.illum.ambientCoef = illumination.ambientCoef ?? state.illum.ambientCoef;
+  }
+
+  if (!isInteractionLocked('illum-lambertian-weight')) {
+    state.illum.lambertianWeight =
+      illumination.shadingLambertianWeight ?? state.illum.lambertianWeight;
+  }
+
+  if (!isInteractionLocked('illum-slope-weight')) {
+    state.illum.slopeWeight =
+      illumination.shadingSlopeWeight ?? state.illum.slopeWeight;
+  }
+
+  if (!isInteractionLocked('illum-aspect-weight')) {
+    state.illum.aspectWeight =
+      illumination.shadingAspectWeight ?? state.illum.aspectWeight;
+  }
+
+  state.illum.useLighting = illumination.useLighting ?? state.illum.useLighting;
+  state.illum.type = illumination.light.type;
+
+  if (illumination.light.diffuseColor) {
+    state.illum.diffuseColor = rgb255ToHex(illumination.light.diffuseColor);
+  }
+
+  if (illumination.light.specularColor) {
+    state.illum.specularColor = rgb255ToHex(illumination.light.specularColor);
+  }
+}
+
+function syncAtmosphereFromMap() {
+  const atmosphere = map.getAtmosphere();
+
+  if (!atmosphere) {
+    return;
+  }
+
+  state.atm.visibilityEnabled =
+    atmosphere.visibilityToEyeDistance !== undefined;
+  state.atm.edgeEnabled =
+    atmosphere.edgeDistanceToEyeDistance !== undefined;
+
+  if (!isInteractionLocked('atm-visibility-factor')
+      && atmosphere.visibilityToEyeDistance !== undefined) {
+    state.atm.visibilityToEyeDistance = atmosphere.visibilityToEyeDistance;
+  }
+
+  if (!isInteractionLocked('atm-edge-factor')
+      && atmosphere.edgeDistanceToEyeDistance !== undefined) {
+    state.atm.edgeDistanceToEyeDistance =
+      atmosphere.edgeDistanceToEyeDistance;
+  }
+}
+
+function syncRenderingOptionsFromMap() {
+  const options = map.getRenderingOptions();
+  if (!options) return;
+
+  state.opts.useLighting = !!options.useLighting;
+  state.illum.useLighting = !!options.useLighting;
+  state.opts.useNormalMaps = !!options.useNormalMaps;
+  state.opts.useDiffuseMaps = !!options.useDiffuseMaps;
+  state.opts.useSpecularMaps = !!options.useSpecularMaps;
+  state.opts.useBumpMaps = !!options.useBumpMaps;
+  state.opts.useAtmosphere = !!options.useAtmosphere;
+  state.opts.useShadows = !!options.useShadows;
+  state.opts.useLabels = !!options.useLabels;
+  state.illum.lambertianActive = !!options.useShadingLambertian;
+  state.illum.slopeActive = !!options.useShadingSlope;
+  state.illum.aspectActive = !!options.useShadingAspect;
+}
+
+function syncVerticalExaggerationFromMap() {
+  const spec = map.getVerticalExaggeration() || {};
+
+  if (!isInteractionLocked('ve-scale')) {
+    state.ve.scaleEnabled = !!spec.scaleRamp;
+    if (spec.scaleRamp) {
+      state.ve.scale.x1 = spec.scaleRamp.min[0];
+      state.ve.scale.y1 = spec.scaleRamp.min[1];
+      state.ve.scale.x2 = spec.scaleRamp.max[0];
+      state.ve.scale.y2 = spec.scaleRamp.max[1];
+    }
+  }
+
+  if (!isInteractionLocked('ve-elev')) {
+    state.ve.elevEnabled = !!spec.elevationRamp;
+    if (spec.elevationRamp) {
+      state.ve.elev.x1 = spec.elevationRamp.min[0];
+      state.ve.elev.y1 = spec.elevationRamp.min[1];
+      state.ve.elev.x2 = spec.elevationRamp.max[0];
+      state.ve.elev.y2 = spec.elevationRamp.max[1];
+    }
+  }
+}
+
+function startMapStateSync() {
+  let lastScaleRamp = cloneRampState(state.ve.scale);
+  let lastElevRamp = cloneRampState(state.ve.elev);
+
+  const sync = () => {
+    if (!map) return;
+
+    syncIlluminationFromMap();
+    syncAtmosphereFromMap();
+    syncRenderingOptionsFromMap();
+    normalizeActiveShadingWeights();
+    syncVerticalExaggerationFromMap();
+    updateComputedScaleIndicator();
+
+    syncIlluminationUi();
+    syncAtmosphereUi();
+
+    if (!rampEquals(lastScaleRamp, state.ve.scale)
+        || ui.ve.scaleEnabled.checked !== state.ve.scaleEnabled) {
+      syncVeUi();
+      lastScaleRamp = cloneRampState(state.ve.scale);
+      lastElevRamp = cloneRampState(state.ve.elev);
+    } else if (!rampEquals(lastElevRamp, state.ve.elev)
+        || ui.ve.elevEnabled.checked !== state.ve.elevEnabled) {
+      syncVeUi();
+      lastScaleRamp = cloneRampState(state.ve.scale);
+      lastElevRamp = cloneRampState(state.ve.elev);
+    }
+
+    syncOptsUi();
+  };
+
+  const off = map.on('tick', sync);
+  sync();
+  return () => { if (off) off(); };
+}
+
+async function main() {
+  const defaultPos = ['obj', 15.588508, 50.732641, 'fix',
+    1059.58, 55.91, -50.14, 0.00, 19305.21, 30.00];
+  const position = posFromURL() || defaultPos;
+  const params = new URLSearchParams(window.location.search);
+
+  let style;
+  try {
+    style = await loadStyle(params);
+  } catch (e) {
+    console.error('Failed to load style:', e);
+    return;
+  }
+
+  const options = cartolina.runtimeOptionsFromUrl({ positionInUrl: true });
+
+  map = cartolina.map({
+    container: 'map',
+    style,
+    position,
+    options,
+  });
+
+  await map.ready;
+  startMapStateSync();
+}
+
+buildIllumTab();
+buildVeTab();
+buildOptsTab();
+main().catch(console.error);
+</script>
+</body>
+</html>
