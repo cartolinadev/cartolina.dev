@@ -44,3 +44,26 @@
 - **Default position updated:** relief-lab default camera position changed
   to `obj,15.302410,50.700302,fix,591.49,55.69,-50.14,0.00,49182.93,30.00`;
   old position commented out in code for easy rollback.
+- **VE style output fix:** `buildCurrentStyle` was always writing
+  `"vertical-exaggeration": {}` when both ramps were disabled — an empty
+  object is truthy so cartolina would enter the deprecated `setSuperElevation`
+  path. Fixed to omit the key entirely when neither ramp is active.
+- **URL position tracking:** `positionInUrl` is now `false` by default;
+  append `?trackpos` to opt in to URL-tracked navigation.
+
+## 2026-04-24
+
+- **Relief-lab default VE ramp values updated** (commit `1d6b0bd`): hardcoded
+  fallback knob positions in `state.ve` changed to match a representative
+  real-world style (`scaleRamp` min `[40000, 1]` / max `[53937538, 13.5]`;
+  `elevationRamp` min `[1700, 2]` / max `[4000, 1.3]`).
+- **`setAtmosphere` bug found in cartolina-js** (backlog entry added): on styles
+  without an `atmosphere` section (e.g. `harrachov.json`), `map.setAtmosphere()`
+  is silently discarded — `this._map.atmosphere` is null, optional-chain
+  short-circuits, `getAtmosphere()` still returns null. Enabling
+  `mapFlagAtmosphere` has no visual effect. Injecting a default atmosphere
+  section at load time was tried but reverted: it caused the background sky
+  shader to activate unconditionally, because `mapFlagAtmosphere: false` does
+  not suppress the background component — only terrain haze. Proper fix requires
+  cartolina-js to create the atmosphere subsystem on-demand in `setAtmosphere`.
+  Comment added to `src/browser/viewer.ts:setAtmosphere`; backlog updated.
