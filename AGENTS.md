@@ -5,6 +5,10 @@
 At the start of each working session, read
 [docs/session-log.md](docs/session-log.md).
 
+Before every commit, review and update the session log so it reflects the
+current state of things. Then commit the session log together with the
+other changes (or in a follow-up commit immediately after).
+
 During and after work, append any nontrivial observations to the session
 log:
 - Surprising project structure or configuration details
