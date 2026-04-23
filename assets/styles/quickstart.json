@@ -11,8 +11,7 @@
             "sources": ["topoearth-copernicus-dem-glo30"]
         },
         "illumination": {
-            "light": ["tracking", 315, 45],
-            "ambientCoef": 0.0
+            "light": ["tracking", 315, 45]
         },
         "vertical-exaggeration" : {
             "heightRamp": [[0,4000], [1.5,1.3]],
