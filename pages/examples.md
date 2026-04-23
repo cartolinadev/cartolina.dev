@@ -15,7 +15,7 @@ sidebar:
 
 [Terrain with satellite imagery and lettering](/examples/terrain-satellite-imagery-and-lettering)
 
-Terrain using server-side shaded relief with view-dependent transparency
+[Relief-shading in web-based 3D terrain maps — lab application](/examples/relief-shading-in-web-based-3d-terrain-maps)
 
 Complex terrain with bump maps, sun glints and lettering
 
