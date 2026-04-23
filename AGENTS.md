@@ -17,6 +17,9 @@ or after completing a step — without asking first.
 This means no `git checkout main`, no `git merge`, no `git commit` while on
 main, no `git push` to main — nothing — until the user says to do it.**
 
+**All work happens on a feature branch. If you are on main, stop and switch
+to a feature branch before touching any files.**
+
 During and after work, append any nontrivial observations to the session
 log:
 - Surprising project structure or configuration details
