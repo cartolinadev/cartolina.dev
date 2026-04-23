@@ -139,8 +139,11 @@
     display: flex;
     border-bottom: 1px solid var(--panel-rule);
     flex-shrink: 0;
-    overflow: hidden;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
+
+  #tabs::-webkit-scrollbar { display: none; }
 
   .tab-btn {
     flex: 0 0 auto;
