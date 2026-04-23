@@ -20,7 +20,7 @@
     --panel-input-bg: rgba(255, 255, 255, 0.60);
     --panel-track: rgba(15, 23, 42, 0.10);
     --panel-graph-bg: rgba(249, 250, 251, 0.64);
-    --panel-w: min(430px, 30vw);
+    --panel-w: min(470px, 32vw);
     --tab-h: 38px;
     --grid: #e5e5e5;
     --graph-stroke: #1a1a1a;
@@ -146,21 +146,27 @@
   #tabs::-webkit-scrollbar { display: none; }
 
   .tab-btn {
-    flex: 1 1 0;
+    flex: 0 0 auto;
     height: var(--tab-h);
     border: none;
     background: transparent;
     color: #334150;
-    font: 11px/1.2 var(--font);
+    font: 12px/1 var(--font);
     font-weight: 700;
     letter-spacing: 0.03em;
     text-transform: uppercase;
     cursor: pointer;
     border-bottom: 2px solid transparent;
     transition: color 120ms, border-color 120ms;
-    white-space: normal;
-    text-align: center;
-    padding: 0 6px;
+    white-space: nowrap;
+    padding: 0 16px;
+  }
+
+  .tab-btn--icon {
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .tab-btn:hover { color: var(--panel-fg); }
@@ -629,7 +635,12 @@
       <button class="tab-btn active" data-tab="illum">Light &amp; Shading</button>
       <button class="tab-btn" data-tab="ve">Vertical Exaggeration</button>
       <button class="tab-btn" data-tab="opts">Options</button>
-      <button class="tab-btn" data-tab="style">Style</button>
+      <button class="tab-btn tab-btn--icon" data-tab="style" title="Style JSON">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 2.5C4 2.5 3 3 3 4.5V6C3 6.8 2.5 7.5 2 7.5C2.5 7.5 3 8.2 3 9V10.5C3 12 4 12.5 5 12.5"/>
+          <path d="M10 2.5C11 2.5 12 3 12 4.5V6C12 6.8 12.5 7.5 13 7.5C12.5 7.5 12 8.2 12 9V10.5C12 12 11 12.5 10 12.5"/>
+        </svg>
+      </button>
     </div>
 
     <div id="tab-content">
