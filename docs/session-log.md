@@ -67,3 +67,12 @@
   not suppress the background component — only terrain haze. Proper fix requires
   cartolina-js to create the atmosphere subsystem on-demand in `setAtmosphere`.
   Comment added to `src/browser/viewer.ts:setAtmosphere`; backlog updated.
+- **`mapFlagAtmosphere` background sky bug** (backlog entry added): the flag
+  only gates terrain haze, not the background sky shader. Separate cartolina-js
+  backlog entry filed.
+- **Relief-lab reset view button** (commit `b4ee042`): semi-transparent black
+  button bottom-right of the map, returns camera to initial position via
+  `map.setPosition(position)`.
+- **Specular color picker dims when specular maps off** (commit `b4ee042`):
+  `syncIlluminationUi` now toggles `.disabled` on `#specular-color-label` and
+  `#ctrl-specular` based on `state.opts.useSpecularMaps`.
