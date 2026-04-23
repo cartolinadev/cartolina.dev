@@ -32,3 +32,15 @@
   manual relaunch. When the MCP browser is unavailable, use
   `cd cartolina-js && node -e "..."` with the cartolina-js node/Playwright
   env as a fallback for DOM inspection.
+- **Style tab — config flags bug** (branch `feature/relief-lab-style-tab`):
+  `buildCurrentStyle()` was copying `originalStyle` verbatim, so
+  `config.mapShadingSlope`, `config.mapShadingAspect` (and lambertian,
+  atmosphere, normalMaps, diffuseMaps, specularMaps, bumpMaps, shadows,
+  labels) never reflected the current UI toggle state. Fixed by always
+  writing all controlled flags from `state` unconditionally. Config key
+  names: `mapShadingLambertian`, `mapShadingSlope`, `mapShadingAspect`,
+  `mapFlagNormalMaps`, `mapFlagDiffuseMaps`, `mapFlagSpecularMaps`,
+  `mapFlagBumpMaps`, `mapFlagAtmosphere`, `mapFlagShadows`, `mapFlagLabels`.
+- **Default position updated:** relief-lab default camera position changed
+  to `obj,15.302410,50.700302,fix,591.49,55.69,-50.14,0.00,49182.93,30.00`;
+  old position commented out in code for easy rollback.
