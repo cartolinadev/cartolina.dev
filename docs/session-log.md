@@ -7,7 +7,6 @@
 - A `cartolina-js/docs/wiki` directory is also mounted as an additional working directory, suggesting wiki content may be managed separately from the main docs site.
 - **Ruby environment conflict:** The system has snap Ruby 4.0 (`/snap/bin/bundle`) and apt Ruby 3.0 (`/usr/bin/bundle3.0`). The `github-pages` gem's `ffi` dependency requires Ruby < 3.5, so snap Ruby breaks `bundle install`. Always use `/usr/bin/bundle3.0` explicitly. Also requires `ruby3.0-dev` apt package for native extensions (bigdecimal, ffi, commonmarker, eventmachine). Bundle path is set locally to `vendor/bundle` (gitignored) to avoid needing sudo. README updated to reflect this.
 - **`examples.md` ordering convention:** implemented example links must come before unimplemented placeholder lines.
-- **`vendor/` must be in Jekyll's exclude list**
 - **`vendor/` must be in Jekyll's `exclude:` list** (`_config.yml`): Jekyll
   would otherwise try to parse gem template files inside `vendor/bundle` as
   posts, failing with an invalid-date error on a `.markdown.erb` file.
@@ -22,3 +21,13 @@
   button uses `navigator.clipboard.writeText()` and flashes "Copied!" for
   1.5 s. No cartolina-js library changes needed; demo stays on CDN. Full
   plan at `~/.claude/plans/humble-moseying-liskov.md`.
+- **Style tab overflow fix** (uncommitted, branch `feature/relief-lab-style-tab`):
+  The 4 tab buttons overflow the 429px panel width (total scroll width 542px).
+  Fixed `#tabs` CSS: `overflow: hidden` → `overflow-x: auto` with
+  `scrollbar-width: none` / `::-webkit-scrollbar { display: none }`.
+  Playwright MCP browser was unresponsive during this session — relaunch and
+  verify the Style tab is visible, then commit and merge to main.
+- **Playwright MCP:** the browser context dies between sessions and needs a
+  manual relaunch. When the MCP browser is unavailable, use
+  `cd cartolina-js && node -e "..."` with the cartolina-js node/Playwright
+  env as a fallback for DOM inspection.
