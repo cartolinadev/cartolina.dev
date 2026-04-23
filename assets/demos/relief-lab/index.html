@@ -1326,9 +1326,9 @@ function buildCurrentStyle() {
         specularColor: hexToRgb255(s.specularColor),
       },
       ambientCoef: s.ambientCoef,
-      shadingLambertianWeight: s.lambertianWeight,
-      shadingSlopeWeight:      s.slopeWeight,
-      shadingAspectWeight:     s.aspectWeight,
+      shadingLambertianWeight: s.lambertianActive ? s.lambertianWeight : 0,
+      shadingSlopeWeight:      s.slopeActive      ? s.slopeWeight      : 0,
+      shadingAspectWeight:     s.aspectActive     ? s.aspectWeight     : 0,
     };
   } else {
     delete out.illumination;
