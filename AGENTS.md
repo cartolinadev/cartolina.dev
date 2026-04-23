@@ -5,9 +5,10 @@
 At the start of each working session, read
 [docs/session-log.md](docs/session-log.md).
 
-Before every commit, review and update the session log so it reflects the
-current state of things. Then commit the session log together with the
-other changes (or in a follow-up commit immediately after).
+**Before every commit** — without exception — update the session log to
+reflect the current state of things. Commit the session log together with
+the other changes. This is mandatory; do not skip it even for small or
+"obvious" changes.
 
 On a feature branch, commit freely — at milestones during implementation
 or after completing a step — without asking first.
