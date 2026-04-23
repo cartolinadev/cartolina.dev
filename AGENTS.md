@@ -10,8 +10,11 @@ current state of things. Then commit the session log together with the
 other changes (or in a follow-up commit immediately after).
 
 On a feature branch, commit freely — at milestones during implementation
-or after completing a step — without asking first. On the main branch,
-always ask before committing.
+or after completing a step — without asking first.
+
+**NEVER commit, merge, or push to main without explicit user confirmation.
+This means no `git checkout main`, no `git merge`, no `git commit` while on
+main, no `git push` to main — nothing — until the user says to do it.**
 
 During and after work, append any nontrivial observations to the session
 log:
