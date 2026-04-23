@@ -70,6 +70,10 @@
 - **`mapFlagAtmosphere` background sky bug** (backlog entry added): the flag
   only gates terrain haze, not the background sky shader. Separate cartolina-js
   backlog entry filed.
+- **VE graph numeric inputs non-functional** (fixed): `draw()` inside
+  `makeRampGraph` ran every tick and unconditionally overwrote input values,
+  resetting anything typed before it could be committed. Fixed by skipping
+  the overwrite when `document.activeElement` is the target input.
 - **Relief-lab reset view button** (commit `b4ee042`): semi-transparent black
   button bottom-right of the map, returns camera to initial position via
   `map.setPosition(position)`.

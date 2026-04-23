@@ -1820,11 +1820,12 @@ function makeRampGraph(cfg) {
         + `<line class="g-marker-hit" x1="${markerX}" y1="${PAD}" x2="${markerX}" y2="${H - PAD}"/>`;
     }
 
-    // sync numeric inputs
-    document.getElementById(g.n1Id).value = Math.round(s.x1);
-    document.getElementById(g.n2Id).value = Math.round(s.x2);
-    document.getElementById(g.n3Id).value = s.y1.toFixed(2);
-    document.getElementById(g.n4Id).value = s.y2.toFixed(2);
+    // sync numeric inputs — skip fields the user is currently editing
+    const ae = document.activeElement;
+    const n1 = document.getElementById(g.n1Id); if (ae !== n1) n1.value = Math.round(s.x1);
+    const n2 = document.getElementById(g.n2Id); if (ae !== n2) n2.value = Math.round(s.x2);
+    const n3 = document.getElementById(g.n3Id); if (ae !== n3) n3.value = s.y1.toFixed(2);
+    const n4 = document.getElementById(g.n4Id); if (ae !== n4) n4.value = s.y2.toFixed(2);
   }
 
   function setCurrentX(value) {
