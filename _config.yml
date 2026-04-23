@@ -60,6 +60,7 @@ exclude:
   - ".#*"
   - "#*#"
   - ".DS_Store"
+  - vendor/
       
 footer:
   links:
