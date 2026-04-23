@@ -59,11 +59,11 @@
   `elevationRamp` min `[1700, 2]` / max `[4000, 1.3]`).
 - **`setAtmosphere` bug found in cartolina-js** (backlog entry added): on styles
   without an `atmosphere` section (e.g. `harrachov.json`), `map.setAtmosphere()`
-  is silently discarded because `this._map.atmosphere` is null and the
-  optional-chain short-circuits. `getAtmosphere()` returns null both before and
-  after the call, giving no feedback. Enabling `mapFlagAtmosphere` has no visual
-  effect in this case. Workaround applied in the relief-lab demo: inject a
-  default atmosphere object into the style before passing to `cartolina.map()`
-  (only when the style has no atmosphere section, and only on the copy passed to
-  the engine — `originalStyle` is kept unmodified). Comment added to
-  `src/browser/viewer.ts:setAtmosphere`.
+  is silently discarded — `this._map.atmosphere` is null, optional-chain
+  short-circuits, `getAtmosphere()` still returns null. Enabling
+  `mapFlagAtmosphere` has no visual effect. Injecting a default atmosphere
+  section at load time was tried but reverted: it caused the background sky
+  shader to activate unconditionally, because `mapFlagAtmosphere: false` does
+  not suppress the background component — only terrain haze. Proper fix requires
+  cartolina-js to create the atmosphere subsystem on-demand in `setAtmosphere`.
+  Comment added to `src/browser/viewer.ts:setAtmosphere`; backlog updated.
