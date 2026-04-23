@@ -1360,6 +1360,18 @@ function buildCurrentStyle() {
     delete out.atmosphere;
   }
 
+  if (!out.config) out.config = {};
+  out.config.mapShadingLambertian = s.lambertianActive;
+  out.config.mapShadingSlope      = s.slopeActive;
+  out.config.mapShadingAspect     = s.aspectActive;
+  out.config.mapFlagNormalMaps    = state.opts.useNormalMaps;
+  out.config.mapFlagDiffuseMaps   = state.opts.useDiffuseMaps;
+  out.config.mapFlagSpecularMaps  = state.opts.useSpecularMaps;
+  out.config.mapFlagBumpMaps      = state.opts.useBumpMaps;
+  out.config.mapFlagAtmosphere    = state.opts.useAtmosphere;
+  out.config.mapFlagShadows       = state.opts.useShadows;
+  out.config.mapFlagLabels        = state.opts.useLabels;
+
   return out;
 }
 
@@ -2380,8 +2392,10 @@ function startMapStateSync() {
 }
 
 async function main() {
-  const defaultPos = ['obj', 15.588508, 50.732641, 'fix',
-    1059.58, 55.91, -50.14, 0.00, 19305.21, 30.00];
+  // const defaultPos = ['obj', 15.588508, 50.732641, 'fix',
+  //   1059.58, 55.91, -50.14, 0.00, 19305.21, 30.00];
+  const defaultPos = ['obj', 15.302410, 50.700302, 'fix',
+    591.49, 55.69, -50.14, 0.00, 49182.93, 30.00];
   const position = posFromURL() || defaultPos;
   const params = new URLSearchParams(window.location.search);
 
