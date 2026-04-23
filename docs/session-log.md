@@ -21,12 +21,13 @@
   button uses `navigator.clipboard.writeText()` and flashes "Copied!" for
   1.5 s. No cartolina-js library changes needed; demo stays on CDN. Full
   plan at `~/.claude/plans/humble-moseying-liskov.md`.
-- **Style tab overflow fix** (uncommitted, branch `feature/relief-lab-style-tab`):
-  The 4 tab buttons overflow the 429px panel width (total scroll width 542px).
-  Fixed `#tabs` CSS: `overflow: hidden` → `overflow-x: auto` with
-  `scrollbar-width: none` / `::-webkit-scrollbar { display: none }`.
-  Playwright MCP browser was unresponsive during this session — relaunch and
-  verify the Style tab is visible, then commit and merge to main.
+- **Style tab visibility fix** (commit `168e402`, branch
+  `feature/relief-lab-style-tab`): Previous `overflow-x: auto` approach left
+  the Style tab scrolled off-screen with no visible affordance. Fixed by
+  switching `.tab-btn` to `flex: 1 1 0` (equal-width buttons), reducing font
+  to 11px, allowing `white-space: normal`, and narrowing padding to `0 6px`.
+  All 4 tabs now fit within the panel width and the Style tab is fully
+  functional. Branch is ready to merge to main.
 - **Playwright MCP:** the browser context dies between sessions and needs a
   manual relaunch. When the MCP browser is unavailable, use
   `cd cartolina-js && node -e "..."` with the cartolina-js node/Playwright
