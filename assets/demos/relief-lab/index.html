@@ -176,6 +176,38 @@
   .tab-pane { display: none; }
   .tab-pane.active { display: block; }
 
+  #style-output {
+    width: 100%;
+    height: 300px;
+    resize: none;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    background: var(--panel-input-bg);
+    color: var(--panel-fg);
+    border: 1px solid var(--panel-rule);
+    border-radius: 4px;
+    padding: 10px;
+  }
+
+  .copy-btn {
+    display: block;
+    margin: 8px 0 0 auto;
+    padding: 4px 14px;
+    font-size: 12px;
+    background: transparent;
+    color: rgba(var(--accent-rgb), 1);
+    border: 1px solid rgba(var(--accent-rgb), 1);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 150ms, color 150ms;
+  }
+
+  .copy-btn:hover {
+    background: rgba(var(--accent-rgb), 1);
+    color: #fff;
+  }
+
   /* ── section headings ───────────────────────────────────── */
   .section {
     padding: 20px 24px 18px;
@@ -593,6 +625,7 @@
       <button class="tab-btn active" data-tab="illum">Light &amp; Shading</button>
       <button class="tab-btn" data-tab="ve">Vertical Exaggeration</button>
       <button class="tab-btn" data-tab="opts">Options</button>
+      <button class="tab-btn" data-tab="style">Style</button>
     </div>
 
     <div id="tab-content">
@@ -868,6 +901,15 @@
         </div>
       </div>
 
+      <!-- ── Tab 4: Style JSON ──────────────────────────────── -->
+      <div class="tab-pane" id="pane-style">
+        <div class="section">
+          <textarea id="style-output" readonly
+            spellcheck="false"></textarea>
+          <button class="copy-btn" id="copy-style-btn">Copy</button>
+        </div>
+      </div>
+
     </div><!-- /tab-content -->
 
   </div><!-- /panel -->
@@ -1095,6 +1137,7 @@ function rampEquals(a, b) {
 /* ── API bridges ─────────────────────────────────────────── */
 
 let map = null;
+let originalStyle = null;
 
 function getActiveShadingWeightKeys() {
   const keys = [];
@@ -1195,6 +1238,7 @@ function applyIllumination() {
     shadingSlopeWeight:      s.slopeWeight,
     shadingAspectWeight:     s.aspectWeight,
   });
+  refreshStyleTab();
 }
 
 function applyVerticalExaggeration() {
@@ -1209,11 +1253,13 @@ function applyVerticalExaggeration() {
     spec.elevationRamp = { min: [el.x1, el.y1], max: [el.x2, el.y2] };
   }
   map.setVerticalExaggeration(spec);
+  refreshStyleTab();
 }
 
 function applyRenderingOptions(partial) {
   if (!map) return;
   map.setRenderingOptions(partial);
+  refreshStyleTab();
 }
 
 function applyAtmosphere() {
@@ -1230,6 +1276,78 @@ function applyAtmosphere() {
   };
 
   map.setAtmosphere(spec);
+  refreshStyleTab();
+}
+
+/* ── Style tab helpers ───────────────────────────────────── */
+
+function buildCurrentStyle() {
+  if (!originalStyle) return {};
+  const out = JSON.parse(JSON.stringify(originalStyle));
+  const s = state.illum;
+
+  if (s.useLighting) {
+    out.illumination = {
+      light: {
+        type: s.type,
+        azimuth: s.azimuth,
+        elevation: s.elevation,
+        diffuseColor:  hexToRgb255(s.diffuseColor),
+        specularColor: hexToRgb255(s.specularColor),
+      },
+      ambientCoef: s.ambientCoef,
+      shadingLambertianWeight: s.lambertianWeight,
+      shadingSlopeWeight:      s.slopeWeight,
+      shadingAspectWeight:     s.aspectWeight,
+    };
+  } else {
+    delete out.illumination;
+  }
+
+  const ve = {};
+  if (state.ve.scaleEnabled) {
+    const sc = state.ve.scale;
+    ve.scaleRamp = { min: [sc.x1, sc.y1], max: [sc.x2, sc.y2] };
+  }
+  if (state.ve.elevEnabled) {
+    const el = state.ve.elev;
+    ve.elevationRamp = { min: [el.x1, el.y1], max: [el.x2, el.y2] };
+  }
+  out['vertical-exaggeration'] = ve;
+
+  if (state.opts.useAtmosphere) {
+    out.atmosphere = {
+      maxVisibility: state.atm.maxVisibility,
+      visibilityToEyeDistance: state.atm.visibilityEnabled
+        ? state.atm.visibilityToEyeDistance : undefined,
+      edgeDistanceToEyeDistance: state.atm.edgeEnabled
+        ? state.atm.edgeDistanceToEyeDistance : undefined,
+    };
+    Object.keys(out.atmosphere).forEach(
+      k => out.atmosphere[k] === undefined && delete out.atmosphere[k]
+    );
+  } else {
+    delete out.atmosphere;
+  }
+
+  return out;
+}
+
+function refreshStyleTab() {
+  const el = document.getElementById('style-output');
+  if (el) el.value = JSON.stringify(buildCurrentStyle(), null, 2);
+}
+
+function buildStyleTab() {
+  document.getElementById('copy-style-btn')
+    .addEventListener('click', () => {
+      const text = document.getElementById('style-output').value;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-style-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      });
+    });
 }
 
 /* ── Tab 1: Illumination UI ──────────────────────────────── */
@@ -2244,6 +2362,7 @@ async function main() {
     console.error('Failed to load style:', e);
     return;
   }
+  originalStyle = JSON.parse(JSON.stringify(style));
 
   const options = cartolina.runtimeOptionsFromUrl({ positionInUrl: true });
 
@@ -2256,11 +2375,13 @@ async function main() {
 
   await map.ready;
   startMapStateSync();
+  refreshStyleTab();
 }
 
 buildIllumTab();
 buildVeTab();
 buildOptsTab();
+buildStyleTab();
 main().catch(console.error);
 </script>
 </body>
