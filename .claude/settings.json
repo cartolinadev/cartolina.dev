@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "~/src/cartolina/cartolina-js"
+    ],
+    "allow": [
+      "Bash(pkill*)",
+      "Bash(rm -f ~/.cache/ms-playwright/*)"
+    ]
+  }
+}
