@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Relief Lab — cartolina</title>
-<script src="https://cdn.tspl.re/libs/cartolina/dist/current/cartolina.min.js"></script>
 <link href="https://cdn.tspl.re/libs/cartolina/dist/current/cartolina.min.css" rel="stylesheet" />
 <style>
   /* ── tokens ─────────────────────────────────────────────── */
@@ -972,8 +971,12 @@
   </div>
 </div>
 
-<script>
-'use strict';
+<script type="module">
+
+import {
+  map as createMap,
+  runtimeOptionsFromUrl
+} from 'https://cdn.tspl.re/libs/cartolina/dist/current/cartolina.min.esm.js';
 
 /* ── helpers ─────────────────────────────────────────────── */
 
@@ -2441,9 +2444,9 @@ async function main() {
   originalStyle = JSON.parse(JSON.stringify(style));
 
   const trackPos = params.has('trackpos');
-  const options = cartolina.runtimeOptionsFromUrl({ positionInUrl: trackPos });
+  const options = runtimeOptionsFromUrl({ positionInUrl: trackPos });
 
-  map = cartolina.map({
+  map = createMap({
     container: 'map',
     style,
     position,
