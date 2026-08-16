@@ -835,7 +835,19 @@
       <!-- ── Tab 2: Vertical Exaggeration ──────────────────── -->
       <div class="tab-pane" id="pane-ve">
 
-        <div class="section">
+        <div class="section"
+          style="border-bottom:none; padding-bottom:0;">
+          <div class="check-row">
+            <input type="checkbox" class="rl-check" id="chk-ve-top" checked />
+            <label class="check-label" for="chk-ve-top"
+              style="font-weight:600;">
+              Vertical exaggeration
+            </label>
+          </div>
+        </div>
+
+        <div id="ve-pane-controls">
+        <div class="section" style="padding-top:8px;">
           <div class="row-note">
             Vertical exaggeration may be expressed as a power-law
             function of the scale denominator, as a linear function of
@@ -940,6 +952,7 @@
             readings.
           </div>
         </div>
+        </div><!-- /ve-pane-controls -->
 
       </div>
 
@@ -1102,6 +1115,7 @@ const state = {
     useAtmosphere: true,
     useShadows: true,
     useLabels: true,
+    useVerticalExaggeration: true,
   },
   atm: {
     maxVisibility: 1000000,
@@ -1312,6 +1326,14 @@ function applyVerticalExaggeration() {
   refreshStyleTab();
 }
 
+// Disabling rendering must not discard the configured height mappings.
+function applyVerticalExaggerationFlag() {
+  applyRenderingOptions({
+    useVerticalExaggeration: state.opts.useVerticalExaggeration,
+  });
+  syncVeUi();
+}
+
 function applyRenderingOptions(partial) {
   if (!map) return;
   map.setRenderingOptions(partial);
@@ -1401,6 +1423,8 @@ function buildCurrentStyle() {
   out.config.mapFlagAtmosphere    = state.opts.useAtmosphere;
   out.config.mapFlagShadows       = state.opts.useShadows;
   out.config.mapFlagLabels        = state.opts.useLabels;
+  out.config.mapFlagVerticalExaggeration =
+    state.opts.useVerticalExaggeration;
 
   return out;
 }
@@ -2061,6 +2085,12 @@ function buildVeTab() {
     });
   }
 
+  ui.ve.useVeTop = document.getElementById('chk-ve-top');
+  ui.ve.useVeTop.addEventListener('change', e => {
+    state.opts.useVerticalExaggeration = e.target.checked;
+    applyVerticalExaggerationFlag();
+  });
+
   ui.ve.scaleEnabled = document.getElementById('chk-scale-ve');
   ui.ve.elevEnabled = document.getElementById('chk-elev-ve');
 
@@ -2096,6 +2126,10 @@ function buildOptsTab() {
     { label: 'Labels',            key: 'useLabels',     stateObj: state.opts,
       description: 'Render style-defined labels.',
       apply() { applyRenderingOptions({ useLabels:       state.opts.useLabels       }); } },
+    { label: 'Vertical exaggeration', key: 'useVerticalExaggeration',
+      stateObj: state.opts,
+      description: 'Applies the vertical exaggeration ramps to the terrain.',
+      apply() { applyVerticalExaggerationFlag(); } },
   ];
 
   const list = document.getElementById('opts-list');
@@ -2247,6 +2281,9 @@ function syncAtmosphereUi() {
 }
 
 function syncVeUi(redrawGraphs = true) {
+  syncCheckbox(ui.ve.useVeTop, state.opts.useVerticalExaggeration);
+  document.getElementById('ve-pane-controls').classList.toggle('disabled',
+    !state.opts.useVerticalExaggeration);
   syncCheckbox(ui.ve.scaleEnabled, state.ve.scaleEnabled);
   syncCheckbox(ui.ve.elevEnabled, state.ve.elevEnabled);
   if (!isInteractionLocked('ve-ppi')) {
@@ -2362,6 +2399,8 @@ function syncRenderingOptionsFromMap() {
   state.opts.useAtmosphere = !!options.useAtmosphere;
   state.opts.useShadows = !!options.useShadows;
   state.opts.useLabels = !!options.useLabels;
+  state.opts.useVerticalExaggeration =
+    !!options.useVerticalExaggeration;
   state.illum.lambertianActive = !!options.useShadingLambertian;
   state.illum.slopeActive = !!options.useShadingSlope;
   state.illum.aspectActive = !!options.useShadingAspect;

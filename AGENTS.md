@@ -1,14 +1,6 @@
 # Agent Instructions
 
-## Session Log
-
-At the start of each working session, read
-[docs/session-log.md](docs/session-log.md).
-
-**Before every commit** — without exception — update the session log to
-reflect the current state of things. Commit the session log together with
-the other changes. This is mandatory; do not skip it even for small or
-"obvious" changes.
+## Git workflow
 
 On a feature branch, commit freely — at milestones during implementation
 or after completing a step — without asking first.
@@ -20,17 +12,17 @@ main, no `git push` to main — nothing — until the user says to do it.**
 **All work happens on a feature branch. If you are on main, stop and switch
 to a feature branch before touching any files.**
 
-During and after work, append any nontrivial observations to the session
-log:
-- Surprising project structure or configuration details
-- Non-obvious constraints, workarounds, or decisions
-- Bugs found (even if not fixed yet)
-- Patterns that will affect future work in this repo
+## Public/private boundary
 
-Keep entries concise — one or two sentences each. Date every entry
-(`YYYY-MM-DD`). Do not log routine progress or ephemeral task state; only
-log what would genuinely help a future session start faster or avoid a
-mistake.
+This repository and the website it publishes are public. Never commit
+secrets, credentials, tokens, personal data, or non-public application,
+customer, partner, hostname, URL, dataset, measurement, screenshot, or
+validation details. Do not include local filesystem paths, scratch plans,
+agent artifacts, or references to private repositories.
+
+Public prose and examples must be self-contained and verifiable from this
+repository or other public sources. When private work informs a change,
+retain only a generic conclusion supported by public code.
 
 ## Examples page ordering
 
